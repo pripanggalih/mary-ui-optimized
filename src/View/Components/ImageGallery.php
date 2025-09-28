@@ -8,21 +8,23 @@ use Illuminate\View\Component;
 
 class ImageGallery extends Component
 {
-    public string $uuid;
+	public string $uuid;
 
-    public function __construct(
-        public array $images,
-        public ?string $id = null,
-        public ?bool $withArrows = false,
-        public ?bool $withIndicators = false
+	private static int $counter = 0;
 
-    ) {
-        $this->uuid = "mary" . md5(serialize($this)) . $id;
-    }
+	public function __construct(
+		public array $images,
+		public ?string $id = null,
+		public ?bool $withArrows = false,
+		public ?bool $withIndicators = false
 
-    public function render(): View|Closure|string
-    {
-        return <<<'HTML'
+	) {
+		$this->uuid = "gallery-" . ++self::$counter;
+	}
+
+	public function render(): View|Closure|string
+	{
+		return <<<'HTML'
                 <div
                     x-data="{
                         init() {
@@ -56,5 +58,5 @@ class ImageGallery extends Component
                     </div>
                 </div>
             HTML;
-    }
+	}
 }

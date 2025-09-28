@@ -8,28 +8,30 @@ use Illuminate\View\Component;
 
 class Rating extends Component
 {
-    public string $uuid;
+	public string $uuid;
 
-    public function __construct(
-        public ?string $id = null,
-        public int $total = 5
-    ) {
-        $this->uuid = "mary" . md5(serialize($this)) . $id;
-    }
+	private static int $counter = 0;
 
-    public function modelName(): ?string
-    {
-        return $this->attributes->whereStartsWith('wire:model')->first();
-    }
+	public function __construct(
+		public ?string $id = null,
+		public int $total = 5
+	) {
+		$this->uuid = "rating-" . ++self::$counter;
+	}
 
-    public function size(): ?string
-    {
-        return str($this->attributes->get('class'))->match('/(rating-(..))/');
-    }
+	public function modelName(): ?string
+	{
+		return $this->attributes->whereStartsWith('wire:model')->first();
+	}
 
-    public function render(): View|Closure|string
-    {
-        return <<<'HTML'
+	public function size(): ?string
+	{
+		return str($this->attributes->get('class'))->match('/(rating-(..))/');
+	}
+
+	public function render(): View|Closure|string
+	{
+		return <<<'HTML'
                 <div class="rating gap-1 {{ $size }}" x-cloak>
                     <!-- NO RATING-->
                     <input
@@ -51,5 +53,5 @@ class Rating extends Component
                     @endfor
                 </div>
             HTML;
-    }
+	}
 }

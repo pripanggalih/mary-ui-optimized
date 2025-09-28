@@ -9,98 +9,100 @@ use Illuminate\View\Component;
 
 class DatePicker extends Component
 {
-    public string $uuid;
+	public string $uuid;
 
-    public function __construct(
-        public ?string $id = null,
-        public ?string $label = null,
-        public ?string $icon = null,
-        public ?string $iconRight = null,
-        public ?string $hint = null,
-        public ?string $hintClass = 'fieldset-label',
-        public ?bool $inline = false,
-        public ?array $config = [],
+	private static int $counter = 0;
 
-        // Slots
-        public mixed $prepend = null,
-        public mixed $append = null,
+	public function __construct(
+		public ?string $id = null,
+		public ?string $label = null,
+		public ?string $icon = null,
+		public ?string $iconRight = null,
+		public ?string $hint = null,
+		public ?string $hintClass = 'fieldset-label',
+		public ?bool $inline = false,
+		public ?array $config = [],
 
-        // Validations
-        public ?string $errorField = null,
-        public ?string $errorClass = 'text-error',
-        public ?bool $omitError = false,
-        public ?bool $firstErrorOnly = false,
-    ) {
-        $this->uuid = "mary" . md5(serialize($this)) . $id;
-    }
+		// Slots
+		public mixed $prepend = null,
+		public mixed $append = null,
 
-    public function modelName(): ?string
-    {
-        return $this->attributes->whereStartsWith('wire:model')->first();
-    }
+		// Validations
+		public ?string $errorField = null,
+		public ?string $errorClass = 'text-error',
+		public ?bool $omitError = false,
+		public ?bool $firstErrorOnly = false,
+	) {
+		$this->uuid = "date-picker-" . ++self::$counter;
+	}
 
-    public function errorFieldName(): ?string
-    {
-        return $this->errorField ?? $this->modelName();
-    }
+	public function modelName(): ?string
+	{
+		return $this->attributes->whereStartsWith('wire:model')->first();
+	}
 
-    public function isReadonly(): bool
-    {
-        return $this->attributes->has('readonly') && $this->attributes->get('readonly') == true;
-    }
+	public function errorFieldName(): ?string
+	{
+		return $this->errorField ?? $this->modelName();
+	}
 
-    public function isDisabled(): bool
-    {
-        return $this->attributes->has('disabled') && $this->attributes->get('disabled') == true;
-    }
+	public function isReadonly(): bool
+	{
+		return $this->attributes->has('readonly') && $this->attributes->get('readonly') == true;
+	}
 
-    public function setup(): string
-    {
-        // Handle `wire:model.live` for `range` dates
-        if (isset($this->config["mode"]) && $this->config["mode"] == "range" && $this->attributes->wire('model')->hasModifier('live')) {
-            $this->attributes->setAttributes([
-                'wire:model' => $this->modelName(),
-                'live' => true
-            ]);
-        }
+	public function isDisabled(): bool
+	{
+		return $this->attributes->has('disabled') && $this->attributes->get('disabled') == true;
+	}
 
-        $config = json_encode(array_merge([
-            'dateFormat' => 'Y-m-d H:i',
-            'altInput' => true,
-            'altInputClass' => ' ',
-            'clickOpens' => ! $this->attributes->has('readonly') || $this->attributes->get('readonly') == false,
-            'defaultDate' => '#model#',
-            'plugins' => ['#plugins#'],
-            'disable' => ['#disable#'],
-        ], Arr::except($this->config, ["plugins"])));
+	public function setup(): string
+	{
+		// Handle `wire:model.live` for `range` dates
+		if (isset($this->config["mode"]) && $this->config["mode"] == "range" && $this->attributes->wire('model')->hasModifier('live')) {
+			$this->attributes->setAttributes([
+				'wire:model' => $this->modelName(),
+				'live' => true
+			]);
+		}
 
-        // Plugins
-        $plugins = "";
+		$config = json_encode(array_merge([
+			'dateFormat' => 'Y-m-d H:i',
+			'altInput' => true,
+			'altInputClass' => ' ',
+			'clickOpens' => ! $this->attributes->has('readonly') || $this->attributes->get('readonly') == false,
+			'defaultDate' => '#model#',
+			'plugins' => ['#plugins#'],
+			'disable' => ['#disable#'],
+		], Arr::except($this->config, ["plugins"])));
 
-        foreach (Arr::get($this->config, 'plugins', []) as $plugin) {
-            $plugins .= "new " . key($plugin) . "( " . json_encode(current($plugin)) . " ),";
-        }
+		// Plugins
+		$plugins = "";
 
-        $config = str_replace('"#plugins#"', $plugins, $config);
+		foreach (Arr::get($this->config, 'plugins', []) as $plugin) {
+			$plugins .= "new " . key($plugin) . "( " . json_encode(current($plugin)) . " ),";
+		}
 
-        // Disables
-        $disables = '';
+		$config = str_replace('"#plugins#"', $plugins, $config);
 
-        foreach (Arr::get($this->config, 'disable', []) as $disable) {
-            $disables .= $disable . ',';
-        }
+		// Disables
+		$disables = '';
 
-        $config = str_replace('"#disable#"', $disables, $config);
+		foreach (Arr::get($this->config, 'disable', []) as $disable) {
+			$disables .= $disable . ',';
+		}
 
-        // Sets default date as current bound model
-        $config = str_replace('"#model#"', '$wire.get("' . $this->modelName() . '")', $config);
+		$config = str_replace('"#disable#"', $disables, $config);
 
-        return $config;
-    }
+		// Sets default date as current bound model
+		$config = str_replace('"#model#"', '$wire.get("' . $this->modelName() . '")', $config);
 
-    public function render(): View|Closure|string
-    {
-        return <<<'BLADE'
+		return $config;
+	}
+
+	public function render(): View|Closure|string
+	{
+		return <<<'BLADE'
             <div wire:key="datepicker-{{ rand() }}">
                 @php
                     // We need this extra step to support models arrays. Ex: wire:model="emails.0"  , wire:model="emails.1"
@@ -197,5 +199,5 @@ class DatePicker extends Component
                 </fieldset>
             </div>
             BLADE;
-    }
+	}
 }

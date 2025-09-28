@@ -9,48 +9,50 @@ use Illuminate\View\Component;
 
 class SelectGroup extends Component
 {
-    public string $uuid;
+	public string $uuid;
 
-    public function __construct(
-        public ?string $id = null,
-        public ?string $label = null,
-        public ?string $icon = null,
-        public ?string $iconRight = null,
-        public ?string $hint = null,
-        public ?string $hintClass = 'fieldset-label',
-        public ?string $placeholder = null,
-        public ?string $placeholderValue = null,
-        public ?bool $inline = false,
-        public ?string $optionValue = 'id',
-        public ?string $optionLabel = 'name',
-        public Collection|array $options = new Collection(),
+	private static int $counter = 0;
 
-        // Slots
-        public mixed $prepend = null,
-        public mixed $append = null,
+	public function __construct(
+		public ?string $id = null,
+		public ?string $label = null,
+		public ?string $icon = null,
+		public ?string $iconRight = null,
+		public ?string $hint = null,
+		public ?string $hintClass = 'fieldset-label',
+		public ?string $placeholder = null,
+		public ?string $placeholderValue = null,
+		public ?bool $inline = false,
+		public ?string $optionValue = 'id',
+		public ?string $optionLabel = 'name',
+		public Collection|array $options = new Collection(),
 
-        // Validations
-        public ?string $errorField = null,
-        public ?string $errorClass = 'text-error',
-        public ?bool $omitError = false,
-        public ?bool $firstErrorOnly = false,
-    ) {
-        $this->uuid = "mary" . md5(serialize($this)) . $id;
-    }
+		// Slots
+		public mixed $prepend = null,
+		public mixed $append = null,
 
-    public function modelName(): ?string
-    {
-        return $this->attributes->whereStartsWith('wire:model')->first();
-    }
+		// Validations
+		public ?string $errorField = null,
+		public ?string $errorClass = 'text-error',
+		public ?bool $omitError = false,
+		public ?bool $firstErrorOnly = false,
+	) {
+		$this->uuid = "select-" . ++self::$counter;
+	}
 
-    public function errorFieldName(): ?string
-    {
-        return $this->errorField ?? $this->modelName();
-    }
+	public function modelName(): ?string
+	{
+		return $this->attributes->whereStartsWith('wire:model')->first();
+	}
 
-    public function render(): View|Closure|string
-    {
-        return <<<'BLADE'
+	public function errorFieldName(): ?string
+	{
+		return $this->errorField ?? $this->modelName();
+	}
+
+	public function render(): View|Closure|string
+	{
+		return <<<'BLADE'
             <div>
                 @php
                     // We need this extra step to support models arrays. Ex: wire:model="emails.0"  , wire:model="emails.1"
@@ -143,5 +145,5 @@ class SelectGroup extends Component
                 </fieldset>
             </div>
             BLADE;
-    }
+	}
 }

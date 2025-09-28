@@ -8,24 +8,26 @@ use Illuminate\View\Component;
 
 class Popover extends Component
 {
-    public string $uuid;
+	public string $uuid;
 
-    public function __construct(
-        public ?string $id = null,
-        public ?string $position = "bottom",
-        public ?string $offset = "10",
+	private static int $counter = 0;
 
-        // Slots
-        public mixed $trigger = null,
-        public mixed $content = null
+	public function __construct(
+		public ?string $id = null,
+		public ?string $position = "bottom",
+		public ?string $offset = "10",
 
-    ) {
-        $this->uuid = "mary" . md5(serialize($this)) . $id;
-    }
+		// Slots
+		public mixed $trigger = null,
+		public mixed $content = null
 
-    public function render(): View|Closure|string
-    {
-        return <<<'HTML'
+	) {
+		$this->uuid = "popover-" . ++self::$counter;
+	}
+
+	public function render(): View|Closure|string
+	{
+		return <<<'HTML'
                 <div
                     x-cloak
                     x-data="{
@@ -63,5 +65,5 @@ class Popover extends Component
                   </div>
                 </div>
             HTML;
-    }
+	}
 }

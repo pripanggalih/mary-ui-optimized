@@ -8,68 +8,70 @@ use Illuminate\View\Component;
 
 class Input extends Component
 {
-    public string $uuid;
+	public string $uuid;
 
-    public function __construct(
-        public ?string $id = null,
-        public ?string $label = null,
-        public ?string $icon = null,
-        public ?string $iconRight = null,
-        public ?string $hint = null,
-        public ?string $hintClass = 'fieldset-label',
-        public ?string $prefix = null,
-        public ?string $suffix = null,
-        public ?bool $inline = false,
-        public ?bool $clearable = false,
-        public ?bool $money = false,
-        public ?string $locale = 'en-US',
+	private static int $counter = 0;
 
-        // Slots
-        public mixed $prepend = null,
-        public mixed $append = null,
+	public function __construct(
+		public ?string $id = null,
+		public ?string $label = null,
+		public ?string $icon = null,
+		public ?string $iconRight = null,
+		public ?string $hint = null,
+		public ?string $hintClass = 'fieldset-label',
+		public ?string $prefix = null,
+		public ?string $suffix = null,
+		public ?bool $inline = false,
+		public ?bool $clearable = false,
+		public ?bool $money = false,
+		public ?string $locale = 'en-US',
 
-        // Validations
-        public ?string $errorField = null,
-        public ?string $errorClass = 'text-error',
-        public ?bool $omitError = false,
-        public ?bool $firstErrorOnly = false,
-    ) {
-        $this->uuid = "mary" . md5(serialize($this)) . $id;
-    }
+		// Slots
+		public mixed $prepend = null,
+		public mixed $append = null,
 
-    public function modelName(): ?string
-    {
-        return $this->attributes->whereStartsWith('wire:model')->first();
-    }
+		// Validations
+		public ?string $errorField = null,
+		public ?string $errorClass = 'text-error',
+		public ?bool $omitError = false,
+		public ?bool $firstErrorOnly = false,
+	) {
+		$this->uuid = "input-" . ++self::$counter;
+	}
 
-    public function errorFieldName(): ?string
-    {
-        return $this->errorField ?? $this->modelName();
-    }
+	public function modelName(): ?string
+	{
+		return $this->attributes->whereStartsWith('wire:model')->first();
+	}
 
-    public function isReadonly(): bool
-    {
-        return $this->attributes->has('readonly') && $this->attributes->get('readonly') == true;
-    }
+	public function errorFieldName(): ?string
+	{
+		return $this->errorField ?? $this->modelName();
+	}
 
-    public function isDisabled(): bool
-    {
-        return $this->attributes->has('disabled') && $this->attributes->get('disabled') == true;
-    }
+	public function isReadonly(): bool
+	{
+		return $this->attributes->has('readonly') && $this->attributes->get('readonly') == true;
+	}
 
-    public function moneySettings(): string
-    {
-        return json_encode([
-            'init' => true,
-            'maskOpts' => [
-                'locales' => $this->locale
-            ]
-        ]);
-    }
+	public function isDisabled(): bool
+	{
+		return $this->attributes->has('disabled') && $this->attributes->get('disabled') == true;
+	}
 
-    public function render(): View|Closure|string
-    {
-        return <<<'BLADE'
+	public function moneySettings(): string
+	{
+		return json_encode([
+			'init' => true,
+			'maskOpts' => [
+				'locales' => $this->locale
+			]
+		]);
+	}
+
+	public function render(): View|Closure|string
+	{
+		return <<<'BLADE'
             <div>
                 @php
                     // We need this extra step to support models arrays. Ex: wire:model="emails.0"  , wire:model="emails.1"
@@ -204,5 +206,5 @@ class Input extends Component
                 </fieldset>
             </div>
             BLADE;
-    }
+	}
 }

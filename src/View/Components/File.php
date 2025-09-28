@@ -8,54 +8,56 @@ use Illuminate\View\Component;
 
 class File extends Component
 {
-    public string $uuid;
+	public string $uuid;
 
-    public function __construct(
-        public ?string $id = null,
-        public ?string $label = null,
-        public ?string $hint = null,
-        public ?string $hintClass = 'fieldset-label',
-        public ?bool $hideProgress = false,
-        public ?bool $cropAfterChange = false,
-        public ?string $changeText = "Change",
-        public ?string $cropTitleText = "Crop image",
-        public ?string $cropCancelText = "Cancel",
-        public ?string $cropSaveText = "Crop",
-        public ?array $cropConfig = [],
-        public ?string $cropMimeType = "image/png",
+	private static int $counter = 0;
 
-        // Validations
-        public ?string $errorField = null,
-        public ?string $errorClass = 'text-error',
-        public ?bool $omitError = false,
-        public ?bool $firstErrorOnly = false,
+	public function __construct(
+		public ?string $id = null,
+		public ?string $label = null,
+		public ?string $hint = null,
+		public ?string $hintClass = 'fieldset-label',
+		public ?bool $hideProgress = false,
+		public ?bool $cropAfterChange = false,
+		public ?string $changeText = "Change",
+		public ?string $cropTitleText = "Crop image",
+		public ?string $cropCancelText = "Cancel",
+		public ?string $cropSaveText = "Crop",
+		public ?array $cropConfig = [],
+		public ?string $cropMimeType = "image/png",
 
-    ) {
-        $this->uuid = "mary" . md5(serialize($this)) . $id;
-    }
+		// Validations
+		public ?string $errorField = null,
+		public ?string $errorClass = 'text-error',
+		public ?bool $omitError = false,
+		public ?bool $firstErrorOnly = false,
 
-    public function modelName(): ?string
-    {
-        return $this->attributes->whereStartsWith('wire:model')->first();
-    }
+	) {
+		$this->uuid = "file-" . ++self::$counter;
+	}
 
-    public function errorFieldName(): ?string
-    {
-        return $this->errorField ?? $this->modelName();
-    }
+	public function modelName(): ?string
+	{
+		return $this->attributes->whereStartsWith('wire:model')->first();
+	}
 
-    public function cropSetup(): string
-    {
-        return json_encode(array_merge([
-            'autoCropArea' => 1,
-            'viewMode' => 1,
-            'dragMode' => 'move'
-        ], $this->cropConfig));
-    }
+	public function errorFieldName(): ?string
+	{
+		return $this->errorField ?? $this->modelName();
+	}
 
-    public function render(): View|Closure|string
-    {
-        return <<<'HTML'
+	public function cropSetup(): string
+	{
+		return json_encode(array_merge([
+			'autoCropArea' => 1,
+			'viewMode' => 1,
+			'dragMode' => 'move'
+		], $this->cropConfig));
+	}
+
+	public function render(): View|Closure|string
+	{
+		return <<<'HTML'
                  <div
                     x-data="{
                         progress: 0,
@@ -231,5 +233,5 @@ class File extends Component
                     </fieldset>
                 </div>
             HTML;
-    }
+	}
 }

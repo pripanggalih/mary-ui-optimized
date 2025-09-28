@@ -8,28 +8,30 @@ use Illuminate\View\Component;
 
 class ListItem extends Component
 {
-    public string $uuid;
+	public string $uuid;
 
-    public function __construct(
-        public object|array $item,
-        public ?string $id = null,
-        public string $avatar = 'avatar',
-        public string $value = 'name',
-        public ?string $subValue = '',
-        public ?bool $noSeparator = false,
-        public ?bool $noHover = false,
-        public ?string $link = null,
-        public ?string $fallbackAvatar = null,
+	private static int $counter = 0;
 
-        // Slots
-        public mixed $actions = null,
-    ) {
-        $this->uuid = "mary" . md5(serialize($this)) . $id;
-    }
+	public function __construct(
+		public object|array $item,
+		public ?string $id = null,
+		public string $avatar = 'avatar',
+		public string $value = 'name',
+		public ?string $subValue = '',
+		public ?bool $noSeparator = false,
+		public ?bool $noHover = false,
+		public ?string $link = null,
+		public ?string $fallbackAvatar = null,
 
-    public function render(): View|Closure|string
-    {
-        return <<<'HTML'
+		// Slots
+		public mixed $actions = null,
+	) {
+		$this->uuid = "listitem-" . ++self::$counter;
+	}
+
+	public function render(): View|Closure|string
+	{
+		return <<<'HTML'
             <div wire:key="{{ $uuid }}">
                 <div
                     {{ $attributes->class([
@@ -109,5 +111,5 @@ class ListItem extends Component
                 @endif
             </div>
         HTML;
-    }
+	}
 }

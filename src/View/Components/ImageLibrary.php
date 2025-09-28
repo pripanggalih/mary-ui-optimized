@@ -9,58 +9,60 @@ use Illuminate\View\Component;
 
 class ImageLibrary extends Component
 {
-    public string $uuid;
+	public string $uuid;
 
-    public string $mimes = 'image/png, image/jpeg';
+	private static int $counter = 0;
 
-    public function __construct(
-        public ?string $id = null,
-        public ?string $label = null,
-        public ?string $hint = null,
-        public ?bool $hideErrors = false,
-        public ?bool $hideProgress = false,
-        public ?string $changeText = "Change",
-        public ?string $cropText = "Crop",
-        public ?string $removeText = "Remove",
-        public ?string $cropTitleText = "Crop image",
-        public ?string $cropCancelText = "Cancel",
-        public ?string $cropSaveText = "Crop",
-        public ?string $addFilesText = "Add images",
-        public ?array $cropConfig = [],
-        public Collection $preview = new Collection(),
+	public string $mimes = 'image/png, image/jpeg';
 
-    ) {
-        $this->uuid = "mary" . md5(serialize($this)) . $id;
-    }
+	public function __construct(
+		public ?string $id = null,
+		public ?string $label = null,
+		public ?string $hint = null,
+		public ?bool $hideErrors = false,
+		public ?bool $hideProgress = false,
+		public ?string $changeText = "Change",
+		public ?string $cropText = "Crop",
+		public ?string $removeText = "Remove",
+		public ?string $cropTitleText = "Crop image",
+		public ?string $cropCancelText = "Cancel",
+		public ?string $cropSaveText = "Crop",
+		public ?string $addFilesText = "Add images",
+		public ?array $cropConfig = [],
+		public Collection $preview = new Collection(),
 
-    public function modelName(): ?string
-    {
-        return $this->attributes->wire('model');
-    }
+	) {
+		$this->uuid = "image-library-" . ++self::$counter;
+	}
 
-    public function libraryName(): ?string
-    {
-        return $this->attributes->wire('library');
-    }
+	public function modelName(): ?string
+	{
+		return $this->attributes->wire('model');
+	}
 
-    public function validationMessage(string $message): string
-    {
-        return str($message)->after('field');
-    }
+	public function libraryName(): ?string
+	{
+		return $this->attributes->wire('library');
+	}
 
-    public function cropSetup(): string
-    {
-        return json_encode(array_merge([
-            'autoCropArea' => 1,
-            'viewMode' => 1,
-            'dragMode' => 'move',
-            'checkCrossOrigin' => false,
-        ], $this->cropConfig));
-    }
+	public function validationMessage(string $message): string
+	{
+		return str($message)->after('field');
+	}
 
-    public function render(): View|Closure|string
-    {
-        return <<<'BLADE'
+	public function cropSetup(): string
+	{
+		return json_encode(array_merge([
+			'autoCropArea' => 1,
+			'viewMode' => 1,
+			'dragMode' => 'move',
+			'checkCrossOrigin' => false,
+		], $this->cropConfig));
+	}
+
+	public function render(): View|Closure|string
+	{
+		return <<<'BLADE'
              <div
                 x-data="{
                     progress: 0,
@@ -249,5 +251,5 @@ class ImageLibrary extends Component
                </fieldset>
             </div>
             BLADE;
-    }
+	}
 }

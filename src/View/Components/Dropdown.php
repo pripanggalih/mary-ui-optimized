@@ -8,24 +8,26 @@ use Illuminate\View\Component;
 
 class Dropdown extends Component
 {
-    public string $uuid;
+	public string $uuid;
 
-    public function __construct(
-        public ?string $id = null,
-        public ?string $label = null,
-        public ?string $icon = 'o-chevron-down',
-        public ?bool $right = false,
-        public ?bool $top = false,
-        public ?bool $noXAnchor = false,
-        // Slots
-        public mixed $trigger = null
-    ) {
-        $this->uuid = "mary" . md5(serialize($this)) . $id;
-    }
+	private static int $counter = 0;
 
-    public function render(): View|Closure|string
-    {
-        return <<<'HTML'
+	public function __construct(
+		public ?string $id = null,
+		public ?string $label = null,
+		public ?string $icon = 'o-chevron-down',
+		public ?bool $right = false,
+		public ?bool $top = false,
+		public ?bool $noXAnchor = false,
+		// Slots
+		public mixed $trigger = null
+	) {
+		$this->uuid = "dropdown-" . ++self::$counter;
+	}
+
+	public function render(): View|Closure|string
+	{
+		return <<<'HTML'
             <details
                 x-data="{open: false}"
                 @click.outside="open = false"
@@ -66,5 +68,5 @@ class Dropdown extends Component
                 </ul>
             </details>
         HTML;
-    }
+	}
 }

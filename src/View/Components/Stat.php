@@ -8,31 +8,33 @@ use Illuminate\View\Component;
 
 class Stat extends Component
 {
-    public string $uuid;
+	public string $uuid;
 
-    public string $tooltipPosition = 'lg:tooltip-top';
+	private static int $counter = 0;
 
-    public function __construct(
-        public ?string $id = null,
-        public ?string $value = null,
-        public ?string $icon = null,
-        public ?string $color = '',
-        public ?string $title = null,
-        public ?string $description = null,
-        public ?string $tooltip = null,
-        public ?string $tooltipLeft = null,
-        public ?string $tooltipRight = null,
-        public ?string $tooltipBottom = null,
+	public string $tooltipPosition = 'lg:tooltip-top';
 
-    ) {
-        $this->uuid = "mary" . md5(serialize($this)) . $id;
-        $this->tooltip = $this->tooltip ?? $this->tooltipLeft ?? $this->tooltipRight ?? $this->tooltipBottom;
-        $this->tooltipPosition = $this->tooltipLeft ? 'lg:tooltip-left' : ($this->tooltipRight ? 'lg:tooltip-right' : ($this->tooltipBottom ? 'lg:tooltip-bottom' : 'lg:tooltip-top'));
-    }
+	public function __construct(
+		public ?string $id = null,
+		public ?string $value = null,
+		public ?string $icon = null,
+		public ?string $color = '',
+		public ?string $title = null,
+		public ?string $description = null,
+		public ?string $tooltip = null,
+		public ?string $tooltipLeft = null,
+		public ?string $tooltipRight = null,
+		public ?string $tooltipBottom = null,
 
-    public function render(): View|Closure|string
-    {
-        return <<<'HTML'
+	) {
+		$this->uuid = "stat-" . ++self::$counter;
+		$this->tooltip = $this->tooltip ?? $this->tooltipLeft ?? $this->tooltipRight ?? $this->tooltipBottom;
+		$this->tooltipPosition = $this->tooltipLeft ? 'lg:tooltip-left' : ($this->tooltipRight ? 'lg:tooltip-right' : ($this->tooltipBottom ? 'lg:tooltip-bottom' : 'lg:tooltip-top'));
+	}
+
+	public function render(): View|Closure|string
+	{
+		return <<<'HTML'
                 <div
                     {{ $attributes->class(["bg-base-100 rounded-lg px-5 py-4  w-full", "lg:tooltip $tooltipPosition" => $tooltip]) }}
 
@@ -61,5 +63,5 @@ class Stat extends Component
                     </div>
                 </div>
             HTML;
-    }
+	}
 }

@@ -9,39 +9,41 @@ use Illuminate\View\Component;
 
 class Group extends Component
 {
-    public string $uuid;
+	public string $uuid;
 
-    public function __construct(
-        public ?string $id = null,
-        public ?string $label = null,
-        public ?string $hint = null,
-        public ?string $hintClass = 'fieldset-label',
-        public ?string $optionValue = 'id',
-        public ?string $optionLabel = 'name',
-        public Collection|array $options = new Collection(),
+	private static int $counter = 0;
 
-        // Validations
-        public ?string $errorField = null,
-        public ?string $errorClass = 'text-error',
-        public ?bool $omitError = false,
-        public ?bool $firstErrorOnly = false,
-    ) {
-        $this->uuid = "mary" . md5(serialize($this)) . $id;
-    }
+	public function __construct(
+		public ?string $id = null,
+		public ?string $label = null,
+		public ?string $hint = null,
+		public ?string $hintClass = 'fieldset-label',
+		public ?string $optionValue = 'id',
+		public ?string $optionLabel = 'name',
+		public Collection|array $options = new Collection(),
 
-    public function modelName(): ?string
-    {
-        return $this->attributes->whereStartsWith('wire:model')->first();
-    }
+		// Validations
+		public ?string $errorField = null,
+		public ?string $errorClass = 'text-error',
+		public ?bool $omitError = false,
+		public ?bool $firstErrorOnly = false,
+	) {
+		$this->uuid = "group-" . ++self::$counter;
+	}
 
-    public function errorFieldName(): ?string
-    {
-        return $this->errorField ?? $this->modelName();
-    }
+	public function modelName(): ?string
+	{
+		return $this->attributes->whereStartsWith('wire:model')->first();
+	}
 
-    public function render(): View|Closure|string
-    {
-        return <<<'BLADE'
+	public function errorFieldName(): ?string
+	{
+		return $this->errorField ?? $this->modelName();
+	}
+
+	public function render(): View|Closure|string
+	{
+		return <<<'BLADE'
                 <div>
                     <fieldset class="fieldset py-0">
                         {{-- STANDARD LABEL --}}
@@ -93,5 +95,5 @@ class Group extends Component
                     </fieldset>
                 </div>
             BLADE;
-    }
+	}
 }

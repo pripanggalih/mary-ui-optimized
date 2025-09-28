@@ -8,32 +8,34 @@ use Illuminate\View\Component;
 
 class Code extends Component
 {
-    public string $uuid;
+	public string $uuid;
 
-    public function __construct(
-        public ?string $id = null,
-        public ?string $label = null,
-        public ?string $hint = '',
-        public string $language = 'javascript',
-        public ?string $lightTheme = 'github_light_default',
-        public ?string $darkTheme = 'github_dark',
-        public ?string $lightClass = "light",
-        public ?string $darkClass = "dark",
-        public string $height = '200px',
-        public string $lineHeight = '2',
-        public bool $printMargin = false,
-    ) {
-        $this->uuid = "mary" . md5(serialize($this)) . $id;
-    }
+	private static int $counter = 0;
 
-    public function modelName(): ?string
-    {
-        return $this->attributes->whereStartsWith('wire:model')->first();
-    }
+	public function __construct(
+		public ?string $id = null,
+		public ?string $label = null,
+		public ?string $hint = '',
+		public string $language = 'javascript',
+		public ?string $lightTheme = 'github_light_default',
+		public ?string $darkTheme = 'github_dark',
+		public ?string $lightClass = "light",
+		public ?string $darkClass = "dark",
+		public string $height = '200px',
+		public string $lineHeight = '2',
+		public bool $printMargin = false,
+	) {
+		$this->uuid = "code-" . ++self::$counter;
+	}
 
-    public function render(): View|Closure|string
-    {
-        return <<<'BLADE'
+	public function modelName(): ?string
+	{
+		return $this->attributes->whereStartsWith('wire:model')->first();
+	}
+
+	public function render(): View|Closure|string
+	{
+		return <<<'BLADE'
             <div>
                 @if($label)
                     <div class="text-xs font-semibold mt-5 mb-3">{{ $label }}</div>
@@ -106,5 +108,5 @@ class Code extends Component
                 @endif
             </div>
         BLADE;
-    }
+	}
 }

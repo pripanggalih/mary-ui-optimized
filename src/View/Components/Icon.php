@@ -10,32 +10,34 @@ use Illuminate\View\Component;
 
 class Icon extends Component
 {
-    public string $uuid;
+	public string $uuid;
 
-    public function __construct(
-        public string $name,
-        public ?string $id = null,
-        public ?string $label = null
-    ) {
-        $this->uuid = "mary" . md5(serialize($this)) . $id;
-    }
+	private static int $counter = 0;
 
-    public function icon(): string|Stringable
-    {
-        $name = Str::of($this->name);
+	public function __construct(
+		public string $name,
+		public ?string $id = null,
+		public ?string $label = null
+	) {
+		$this->uuid = "icon-" . ++self::$counter;
+	}
 
-        return $name->contains('.') ? $name->replace('.', '-') : "heroicon-{$this->name}";
-    }
+	public function icon(): string|Stringable
+	{
+		$name = Str::of($this->name);
 
-    public function labelClasses(): ?string
-    {
-        // Remove `w-*` and `h-*` classes, because it applies only for icon
-        return Str::replaceMatches('/(w-\w*)|(h-\w*)/', '', $this->attributes->get('class') ?? '');
-    }
+		return $name->contains('.') ? $name->replace('.', '-') : "heroicon-{$this->name}";
+	}
 
-    public function render(): View|Closure|string
-    {
-        return <<<'BLADE'
+	public function labelClasses(): ?string
+	{
+		// Remove `w-*` and `h-*` classes, because it applies only for icon
+		return Str::replaceMatches('/(w-\w*)|(h-\w*)/', '', $this->attributes->get('class') ?? '');
+	}
+
+	public function render(): View|Closure|string
+	{
+		return <<<'BLADE'
                 @if(strlen($label ?? '') > 0)
                     <div class="inline-flex items-center gap-1">
                 @endif
@@ -51,5 +53,5 @@ class Icon extends Component
                     </div>
                 @endif
             BLADE;
-    }
+	}
 }

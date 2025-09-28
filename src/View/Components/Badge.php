@@ -8,22 +8,24 @@ use Illuminate\View\Component;
 
 class Badge extends Component
 {
-    public string $uuid;
+	public string $uuid;
 
-    public function __construct(
-        public ?string $id = null,
-        public ?string $value = null,
+	private static int $counter = 0;
 
-    ) {
-        $this->uuid = "mary" . md5(serialize($this)) . $id;
-    }
+	public function __construct(
+		public ?string $id = null,
+		public ?string $value = null,
 
-    public function render(): View|Closure|string
-    {
-        return <<<'HTML'
+	) {
+		$this->uuid = "badge-" . ++self::$counter;
+	}
+
+	public function render(): View|Closure|string
+	{
+		return <<<'HTML'
                 <div {{ $attributes->class(["badge"])}}>
                     {{ $value }}
                 </div>
             HTML;
-    }
+	}
 }

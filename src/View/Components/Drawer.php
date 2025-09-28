@@ -9,37 +9,39 @@ use Livewire\WireDirective;
 
 class Drawer extends Component
 {
-    public string $uuid;
+	public string $uuid;
 
-    public function __construct(
-        public ?string $id = null,
-        public ?bool $right = false,
-        public ?string $title = null,
-        public ?string $subtitle = null,
-        public ?bool $separator = false,
-        public ?bool $withCloseButton = false,
-        public ?bool $closeOnEscape = false,
-        public ?bool $withoutTrapFocus = false,
+	private static int $counter = 0;
 
-        //Slots
-        public ?string $actions = null
-    ) {
-        $this->uuid = "mary" . md5(serialize($this)) . $id;
-    }
+	public function __construct(
+		public ?string $id = null,
+		public ?bool $right = false,
+		public ?string $title = null,
+		public ?string $subtitle = null,
+		public ?bool $separator = false,
+		public ?bool $withCloseButton = false,
+		public ?bool $closeOnEscape = false,
+		public ?bool $withoutTrapFocus = false,
 
-    public function id(): string
-    {
-        return $this->id ?? $this->attributes?->wire('model')->value();
-    }
+		//Slots
+		public ?string $actions = null
+	) {
+		$this->uuid = "drawer-" . ++self::$counter;
+	}
 
-    public function modelName(): WireDirective
-    {
-        return $this->attributes->wire('model');
-    }
+	public function id(): string
+	{
+		return $this->id ?? $this->attributes?->wire('model')->value();
+	}
 
-    public function render(): View|Closure|string
-    {
-        return <<<'HTML'
+	public function modelName(): WireDirective
+	{
+		return $this->attributes->wire('model');
+	}
+
+	public function render(): View|Closure|string
+	{
+		return <<<'HTML'
                 <div
                     x-data="{
                         open:
@@ -106,5 +108,5 @@ class Drawer extends Component
                     </div>
                 </div>
             HTML;
-    }
+	}
 }

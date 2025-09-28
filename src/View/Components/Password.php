@@ -9,73 +9,75 @@ use Illuminate\View\Component;
 
 class Password extends Component
 {
-    public string $uuid;
+	public string $uuid;
 
-    public function __construct(
-        public ?string $id = null,
-        public ?string $label = null,
-        public ?string $icon = null,
-        public ?string $iconRight = null,
-        public ?string $hint = null,
-        public ?string $hintClass = 'fieldset-label',
-        public ?string $prefix = null,
-        public ?string $suffix = null,
-        public ?bool $inline = false,
-        public ?bool $clearable = false,
+	private static int $counter = 0;
 
-        // Password
-        public ?string $passwordIcon = 'o-eye-slash',
-        public ?string $passwordVisibleIcon = 'o-eye',
-        public ?bool $passwordIconTabindex = false,
-        public ?bool $right = false,
-        public ?bool $onlyPassword = false,
+	public function __construct(
+		public ?string $id = null,
+		public ?string $label = null,
+		public ?string $icon = null,
+		public ?string $iconRight = null,
+		public ?string $hint = null,
+		public ?string $hintClass = 'fieldset-label',
+		public ?string $prefix = null,
+		public ?string $suffix = null,
+		public ?bool $inline = false,
+		public ?bool $clearable = false,
 
-        // Slots
-        public mixed $prepend = null,
-        public mixed $append = null,
+		// Password
+		public ?string $passwordIcon = 'o-eye-slash',
+		public ?string $passwordVisibleIcon = 'o-eye',
+		public ?bool $passwordIconTabindex = false,
+		public ?bool $right = false,
+		public ?bool $onlyPassword = false,
 
-        // Validations
-        public ?string $errorField = null,
-        public ?string $errorClass = 'text-error',
-        public ?bool $omitError = false,
-        public ?bool $firstErrorOnly = false,
-    ) {
-        $this->uuid = "mary" . md5(serialize($this)) . $id;
+		// Slots
+		public mixed $prepend = null,
+		public mixed $append = null,
 
-        // Cannot use a left icon when password toggle should be shown on the left side.
-        if (($this->icon && ! $this->right) && ! $this->onlyPassword) {
-            throw new Exception("Cannot use `icon` without providing `right` or `onlyPassword`.");
-        }
+		// Validations
+		public ?string $errorField = null,
+		public ?string $errorClass = 'text-error',
+		public ?bool $omitError = false,
+		public ?bool $firstErrorOnly = false,
+	) {
+		$this->uuid = "password-" . ++self::$counter;
 
-        // Cannot use a right icon when password toggle should be shown on the right side.
-        if (($this->iconRight && $this->right) && ! $this->onlyPassword) {
-            throw new Exception("Cannot use `iconRight` when providing `right` and not providing `onlyPassword`.");
-        }
-    }
+		// Cannot use a left icon when password toggle should be shown on the left side.
+		if (($this->icon && ! $this->right) && ! $this->onlyPassword) {
+			throw new Exception("Cannot use `icon` without providing `right` or `onlyPassword`.");
+		}
 
-    public function modelName(): ?string
-    {
-        return $this->attributes->whereStartsWith('wire:model')->first();
-    }
+		// Cannot use a right icon when password toggle should be shown on the right side.
+		if (($this->iconRight && $this->right) && ! $this->onlyPassword) {
+			throw new Exception("Cannot use `iconRight` when providing `right` and not providing `onlyPassword`.");
+		}
+	}
 
-    public function errorFieldName(): ?string
-    {
-        return $this->errorField ?? $this->modelName();
-    }
+	public function modelName(): ?string
+	{
+		return $this->attributes->whereStartsWith('wire:model')->first();
+	}
 
-    public function placeToggleLeft(): bool
-    {
-        return (! $this->icon && ! $this->right) && ! $this->onlyPassword;
-    }
+	public function errorFieldName(): ?string
+	{
+		return $this->errorField ?? $this->modelName();
+	}
 
-    public function placeToggleRight(): bool
-    {
-        return (! $this->iconRight && $this->right) && ! $this->onlyPassword;
-    }
+	public function placeToggleLeft(): bool
+	{
+		return (! $this->icon && ! $this->right) && ! $this->onlyPassword;
+	}
 
-    public function render(): View|Closure|string
-    {
-        return <<<'BLADE'
+	public function placeToggleRight(): bool
+	{
+		return (! $this->iconRight && $this->right) && ! $this->onlyPassword;
+	}
+
+	public function render(): View|Closure|string
+	{
+		return <<<'BLADE'
             <div>
                 @php
                     // We need this extra step to support models arrays. Ex: wire:model="emails.0"  , wire:model="emails.1"
@@ -201,5 +203,5 @@ class Password extends Component
                 </fieldset>
             </div>
             BLADE;
-    }
+	}
 }

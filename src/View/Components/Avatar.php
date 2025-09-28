@@ -8,35 +8,37 @@ use Illuminate\View\Component;
 
 class Avatar extends Component
 {
-    public string $uuid;
+	public string $uuid;
 
-    /**
-     * @param  ?string  $image  The URL of the avatar image.
-     * @param  ?string  $alt  The HTML `alt` attribute
-     * @param  ?string  $placeholder  The placeholder of the avatar.
-     * @param  ?string  $title  The title text displayed beside the avatar.
-     * @slot  ?string  $title  The title text displayed beside the avatar.
-     * @param  ?string  $subtitle  The subtitle text displayed beside the avatar.
-     * @slot  ?string  $subtitle The subtitle text displayed beside the avatar.
-     */
-    public function __construct(
-        public ?string $id = null,
-        public ?string $image = '',
-        public ?string $alt = '',
-        public ?string $placeholder = '',
-        public ?string $fallbackImage = null,
+	private static int $counter = 0;
 
-        // Slots
-        public ?string $title = null,
-        public ?string $subtitle = null
+	/**
+	 * @param  ?string  $image  The URL of the avatar image.
+	 * @param  ?string  $alt  The HTML `alt` attribute
+	 * @param  ?string  $placeholder  The placeholder of the avatar.
+	 * @param  ?string  $title  The title text displayed beside the avatar.
+	 * @slot  ?string  $title  The title text displayed beside the avatar.
+	 * @param  ?string  $subtitle  The subtitle text displayed beside the avatar.
+	 * @slot  ?string  $subtitle The subtitle text displayed beside the avatar.
+	 */
+	public function __construct(
+		public ?string $id = null,
+		public ?string $image = '',
+		public ?string $alt = '',
+		public ?string $placeholder = '',
+		public ?string $fallbackImage = null,
 
-    ) {
-        $this->uuid = "mary" . md5(serialize($this)) . $id;
-    }
+		// Slots
+		public ?string $title = null,
+		public ?string $subtitle = null
 
-    public function render(): View|Closure|string
-    {
-        return <<<'BLADE'
+	) {
+		$this->uuid = "avatar-" . ++self::$counter;
+	}
+
+	public function render(): View|Closure|string
+	{
+		return <<<'BLADE'
             <div class="flex items-center gap-3">
                 <div class="avatar @if(empty($image)) avatar-placeholder @endif">
                     <div {{ $attributes->class(["w-7 rounded-full", "bg-neutral text-neutral-content" => empty($image)]) }}>
@@ -63,5 +65,5 @@ class Avatar extends Component
                 @endif
             </div>
             BLADE;
-    }
+	}
 }

@@ -9,28 +9,30 @@ use Illuminate\View\Component;
 
 class Step extends Component
 {
-    public string $uuid;
+	public string $uuid;
 
-    public function __construct(
-        public int $step,
-        public string $text,
-        public ?string $id = null,
-        public ?string $icon = null,
-        public ?string $stepClasses = null,
-        public ?string $dataContent = null,
+	private static int $counter = 0;
 
-    ) {
-        $this->uuid = "mary" . md5(serialize($this)) . $id;
-    }
+	public function __construct(
+		public int $step,
+		public string $text,
+		public ?string $id = null,
+		public ?string $icon = null,
+		public ?string $stepClasses = null,
+		public ?string $dataContent = null,
 
-    public function iconHTML(): ?string
-    {
-        return Blade::render("<x-mary-icon name='" . $this->icon . "' class='w-4 w-4' />");
-    }
+	) {
+		$this->uuid = "step-" . ++self::$counter;
+	}
 
-    public function render(): View|Closure|string
-    {
-        return <<<'BLADE'
+	public function iconHTML(): ?string
+	{
+		return Blade::render("<x-mary-icon name='" . $this->icon . "' class='w-4 w-4' />");
+	}
+
+	public function render(): View|Closure|string
+	{
+		return <<<'BLADE'
                     <div
                         class="hidden"
                         x-init="steps.push({ step: '{{ $step }}', text: '{{ $text }}', classes: '{{ $stepClasses }}' @if($icon) , icon: {{ json_encode($iconHTML()) }}  @endif @if($dataContent), dataContent: '{{ $dataContent }}' @endif })"
@@ -40,5 +42,5 @@ class Step extends Component
                         {{ $slot }}
                     </div>
             BLADE;
-    }
+	}
 }

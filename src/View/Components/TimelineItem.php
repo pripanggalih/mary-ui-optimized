@@ -8,25 +8,27 @@ use Illuminate\View\Component;
 
 class TimelineItem extends Component
 {
-    public string $uuid;
+	public string $uuid;
 
-    public function __construct(
-        public string $title,
-        public ?string $id = null,
-        public ?string $subtitle = null,
-        public ?string $description = null,
-        public ?string $icon = null,
-        public ?bool $pending = false,
-        public ?bool $first = false,
-        public ?bool $last = false,
+	private static int $counter = 0;
 
-    ) {
-        $this->uuid = "mary" . md5(serialize($this)) . $id;
-    }
+	public function __construct(
+		public string $title,
+		public ?string $id = null,
+		public ?string $subtitle = null,
+		public ?string $description = null,
+		public ?string $icon = null,
+		public ?bool $pending = false,
+		public ?bool $first = false,
+		public ?bool $last = false,
 
-    public function render(): View|Closure|string
-    {
-        return <<<'HTML'
+	) {
+		$this->uuid = "timeline-item-" . ++self::$counter;
+	}
+
+	public function render(): View|Closure|string
+	{
+		return <<<'HTML'
                 <div>
                     <!-- Last item `border cut` -->
                     <div @class(["border-s-2 border-s-base-300 h-5 -mb-5" => $last, "!border-s-primary" => !$pending])>
@@ -71,5 +73,5 @@ class TimelineItem extends Component
                     </div>
                 </div>
             HTML;
-    }
+	}
 }

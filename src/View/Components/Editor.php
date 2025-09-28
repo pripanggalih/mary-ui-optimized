@@ -8,62 +8,64 @@ use Illuminate\View\Component;
 
 class Editor extends Component
 {
-    public string $uuid;
+	public string $uuid;
 
-    public string $uploadUrl;
+	public string $uploadUrl;
 
-    public function __construct(
-        public ?string $id = null,
-        public ?string $label = null,
-        public ?string $hint = null,
-        public ?string $hintClass = 'fieldset-label',
-        public ?string $disk = 'public',
-        public ?string $folder = 'editor',
-        public ?bool $gplLicense = false,
-        public ?array $config = [],
+	private static int $counter = 0;
 
-        // Validations
-        public ?string $errorField = null,
-        public ?string $errorClass = 'text-error',
-        public ?bool $omitError = false,
-        public ?bool $firstErrorOnly = false,
-    ) {
-        $this->uuid = "mary" . md5(serialize($this)) . $id;
-        $this->uploadUrl = route('mary.upload', absolute: false);
-    }
+	public function __construct(
+		public ?string $id = null,
+		public ?string $label = null,
+		public ?string $hint = null,
+		public ?string $hintClass = 'fieldset-label',
+		public ?string $disk = 'public',
+		public ?string $folder = 'editor',
+		public ?bool $gplLicense = false,
+		public ?array $config = [],
 
-    public function modelName(): ?string
-    {
-        return $this->attributes->whereStartsWith('wire:model')->first();
-    }
+		// Validations
+		public ?string $errorField = null,
+		public ?string $errorClass = 'text-error',
+		public ?bool $omitError = false,
+		public ?bool $firstErrorOnly = false,
+	) {
+		$this->uuid = "editor-" . ++self::$counter;
+		$this->uploadUrl = route('mary.upload', absolute: false);
+	}
 
-    public function errorFieldName(): ?string
-    {
-        return $this->errorField ?? $this->modelName();
-    }
+	public function modelName(): ?string
+	{
+		return $this->attributes->whereStartsWith('wire:model')->first();
+	}
 
-    public function setup(): string
-    {
-        $setup = array_merge([
-            'menubar' => false,
-            'automatic_uploads' => true,
-            'quickbars_insert_toolbar' => false,
-            'branding' => false,
-            'relative_urls' => false,
-            'remove_script_host' => false,
-            'height' => 300,
-            'toolbar' => 'undo redo | align bullist numlist | outdent indent | quickimage quicktable',
-            'quickbars_selection_toolbar' => 'bold italic underline strikethrough | forecolor backcolor | link blockquote removeformat | blocks',
-        ], $this->config);
+	public function errorFieldName(): ?string
+	{
+		return $this->errorField ?? $this->modelName();
+	}
 
-        $setup['plugins'] = str('advlist autolink lists link image table quickbars ')->append($this->config['plugins'] ?? '');
+	public function setup(): string
+	{
+		$setup = array_merge([
+			'menubar' => false,
+			'automatic_uploads' => true,
+			'quickbars_insert_toolbar' => false,
+			'branding' => false,
+			'relative_urls' => false,
+			'remove_script_host' => false,
+			'height' => 300,
+			'toolbar' => 'undo redo | align bullist numlist | outdent indent | quickimage quicktable',
+			'quickbars_selection_toolbar' => 'bold italic underline strikethrough | forecolor backcolor | link blockquote removeformat | blocks',
+		], $this->config);
 
-        return str(json_encode($setup))->trim('{}')->replace("\"", "'")->toString();
-    }
+		$setup['plugins'] = str('advlist autolink lists link image table quickbars ')->append($this->config['plugins'] ?? '');
 
-    public function render(): View|Closure|string
-    {
-        return <<<'BLADE'
+		return str(json_encode($setup))->trim('{}')->replace("\"", "'")->toString();
+	}
+
+	public function render(): View|Closure|string
+	{
+		return <<<'BLADE'
                 @php
                     // Wee need this extra step to support models arrays. Ex: wire:model="emails.0"  , wire:model="emails.1"
                     $uuid = $uuid . $modelName()
@@ -169,5 +171,5 @@ class Editor extends Component
                     </fieldset>
                 </div>
             BLADE;
-    }
+	}
 }

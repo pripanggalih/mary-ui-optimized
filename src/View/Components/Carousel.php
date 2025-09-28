@@ -12,25 +12,27 @@ use Illuminate\View\View;
  */
 class Carousel extends Component
 {
-    public string $uuid;
+	public string $uuid;
 
-    public function __construct(
-        public array $slides,
-        public ?string $id = null,
-        public ?bool $withoutIndicators = false,
-        public ?bool $withoutArrows = false,
-        public ?bool $autoplay = false,
-        public ?int $interval = 2000,
+	private static int $counter = 0;
 
-        // Slots
-        public mixed $content = null,
-    ) {
-        $this->uuid = "mary" . md5(serialize($this)) . $id;
-    }
+	public function __construct(
+		public array $slides,
+		public ?string $id = null,
+		public ?bool $withoutIndicators = false,
+		public ?bool $withoutArrows = false,
+		public ?bool $autoplay = false,
+		public ?int $interval = 2000,
 
-    public function render(): View|Closure|string
-    {
-        return <<<'HTML'
+		// Slots
+		public mixed $content = null,
+	) {
+		$this->uuid = "carousel-" . ++self::$counter;
+	}
+
+	public function render(): View|Closure|string
+	{
+		return <<<'HTML'
             <div x-data="{
                 slides: @js($slides),
                 withoutIndicators: {{ json_encode($withoutIndicators) }},
@@ -138,5 +140,5 @@ class Carousel extends Component
                 @endif
             </div>
         HTML;
-    }
+	}
 }

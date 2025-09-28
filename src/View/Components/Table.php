@@ -13,205 +13,207 @@ use Illuminate\View\Component;
 
 class Table extends Component
 {
-    public string $uuid;
+	public string $uuid;
 
-    public mixed $loop = null;
+	private static int $counter = 0;
 
-    public function __construct(
-        public array $headers,
-        public ArrayAccess|array $rows,
-        public ?string $id = null,
-        public ?bool $striped = false,
-        public ?bool $noHeaders = false,
-        public ?bool $selectable = false,
-        public ?string $selectableKey = 'id',
-        public ?bool $expandable = false,
-        public ?string $expandableKey = 'id',
-        public mixed $expandableCondition = null,
-        public ?string $link = null,
-        public ?bool $withPagination = false,
-        public ?string $perPage = null,
-        public ?array $perPageValues = [10, 20, 50, 100],
-        public ?array $sortBy = [],
-        public ?array $rowDecoration = [],
-        public ?array $cellDecoration = [],
-        public ?bool $showEmptyText = false,
-        public mixed $emptyText = 'No records found.',
-        public string $containerClass = 'overflow-x-auto',
-        public ?bool $noHover = false,
+	public mixed $loop = null;
 
-        // Slots
-        public mixed $actions = null,
-        public mixed $tr = null,
-        public mixed $cell = null,
-        public mixed $expansion = null,
-        public mixed $empty = null,
-        public mixed $footer = null,
+	public function __construct(
+		public array $headers,
+		public ArrayAccess|array $rows,
+		public ?string $id = null,
+		public ?bool $striped = false,
+		public ?bool $noHeaders = false,
+		public ?bool $selectable = false,
+		public ?string $selectableKey = 'id',
+		public ?bool $expandable = false,
+		public ?string $expandableKey = 'id',
+		public mixed $expandableCondition = null,
+		public ?string $link = null,
+		public ?bool $withPagination = false,
+		public ?string $perPage = null,
+		public ?array $perPageValues = [10, 20, 50, 100],
+		public ?array $sortBy = [],
+		public ?array $rowDecoration = [],
+		public ?array $cellDecoration = [],
+		public ?bool $showEmptyText = false,
+		public mixed $emptyText = 'No records found.',
+		public string $containerClass = 'overflow-x-auto',
+		public ?bool $noHover = false,
 
-    ) {
-        if ($this->selectable && $this->expandable) {
-            throw new Exception("You can not combine `expandable` with `selectable`.");
-        }
+		// Slots
+		public mixed $actions = null,
+		public mixed $tr = null,
+		public mixed $cell = null,
+		public mixed $expansion = null,
+		public mixed $empty = null,
+		public mixed $footer = null,
 
-        // Temp
-        $rowDecoration = $this->rowDecoration;
-        $cellDecoration = $this->cellDecoration;
-        $headers = $this->headers;
+	) {
+		if ($this->selectable && $this->expandable) {
+			throw new Exception("You can not combine `expandable` with `selectable`.");
+		}
 
-        // Remove them from serialization, because they are closures.
-        unset($this->rowDecoration);
-        unset($this->cellDecoration);
-        unset($this->headers);
+		// Temp
+		$rowDecoration = $this->rowDecoration;
+		$cellDecoration = $this->cellDecoration;
+		$headers = $this->headers;
 
-        // Serialize
-        $this->uuid = "mary" . md5(serialize($this)) . $id;
+		// Remove them from serialization, because they are closures.
+		unset($this->rowDecoration);
+		unset($this->cellDecoration);
+		unset($this->headers);
 
-        // Put them back
-        $this->rowDecoration = $rowDecoration;
-        $this->cellDecoration = $cellDecoration;
-        $this->headers = $headers;
-    }
+		// Serialize
+		$this->uuid = "table-" . ++self::$counter;
 
-    // Get all ids for selectable and expandable features
-    public function getAllIds(): array
-    {
-        if (is_array($this->rows)) {
-            return collect($this->rows)->pluck($this->selectableKey)->all();
-        }
+		// Put them back
+		$this->rowDecoration = $rowDecoration;
+		$this->cellDecoration = $cellDecoration;
+		$this->headers = $headers;
+	}
 
-        return $this->rows->pluck($this->selectableKey)->all();
-    }
+	// Get all ids for selectable and expandable features
+	public function getAllIds(): array
+	{
+		if (is_array($this->rows)) {
+			return collect($this->rows)->pluck($this->selectableKey)->all();
+		}
 
-    // Check if header is sortable
-    public function isSortable(mixed $header): bool
-    {
-        return count($this->sortBy) && ($header['sortable'] ?? true);
-    }
+		return $this->rows->pluck($this->selectableKey)->all();
+	}
 
-    // Check if header is hidden
-    public function isHidden(mixed $header): bool
-    {
-        return $header['hidden'] ?? false;
-    }
+	// Check if header is sortable
+	public function isSortable(mixed $header): bool
+	{
+		return count($this->sortBy) && ($header['sortable'] ?? true);
+	}
 
-    // Format header
-    public function format(mixed $row, mixed $field, mixed $header): mixed
-    {
-        $format = $header['format'] ?? null;
+	// Check if header is hidden
+	public function isHidden(mixed $header): bool
+	{
+		return $header['hidden'] ?? false;
+	}
 
-        if (! $format) {
-            return $field;
-        }
+	// Format header
+	public function format(mixed $row, mixed $field, mixed $header): mixed
+	{
+		$format = $header['format'] ?? null;
 
-        if (is_callable($format)) {
-            return $format($row, $field);
-        }
+		if (! $format) {
+			return $field;
+		}
 
-        if ($format[0] == 'currency') {
-            return ($format[2] ?? '') . number_format($field, ...str_split($format[1]));
-        }
+		if (is_callable($format)) {
+			return $format($row, $field);
+		}
 
-        if ($format[0] == 'date' && $field) {
-            return Carbon::parse($field)->translatedFormat($format[1]);
-        }
+		if ($format[0] == 'currency') {
+			return ($format[2] ?? '') . number_format($field, ...str_split($format[1]));
+		}
 
-        return $field;
-    }
+		if ($format[0] == 'date' && $field) {
+			return Carbon::parse($field)->translatedFormat($format[1]);
+		}
 
-    // Check if link should be shown in cell
-    public function hasLink(mixed $header): bool
-    {
-        return $this->link && empty($header['disableLink']);
-    }
+		return $field;
+	}
 
-    // Check if is currently sorted by this header
-    public function isSortedBy(mixed $header): bool
-    {
-        if (count($this->sortBy) == 0) {
-            return false;
-        }
+	// Check if link should be shown in cell
+	public function hasLink(mixed $header): bool
+	{
+		return $this->link && empty($header['disableLink']);
+	}
 
-        return $this->sortBy['column'] == ($header['sortBy'] ?? $header['key']);
-    }
+	// Check if is currently sorted by this header
+	public function isSortedBy(mixed $header): bool
+	{
+		if (count($this->sortBy) == 0) {
+			return false;
+		}
 
-    // Handle header sort
-    public function getSort(mixed $header): mixed
-    {
-        if (! $this->isSortable($header)) {
-            return false;
-        }
+		return $this->sortBy['column'] == ($header['sortBy'] ?? $header['key']);
+	}
 
-        if (count($this->sortBy) == 0) {
-            return ['column' => '', 'direction' => ''];
-        }
+	// Handle header sort
+	public function getSort(mixed $header): mixed
+	{
+		if (! $this->isSortable($header)) {
+			return false;
+		}
 
-        $direction = $this->isSortedBy($header)
-            ? ($this->sortBy['direction'] == 'asc') ? 'desc' : 'asc'
-            : 'asc';
+		if (count($this->sortBy) == 0) {
+			return ['column' => '', 'direction' => ''];
+		}
 
-        return ['column' => $header['sortBy'] ?? $header['key'], 'direction' => $direction];
-    }
+		$direction = $this->isSortedBy($header)
+			? ($this->sortBy['direction'] == 'asc') ? 'desc' : 'asc'
+			: 'asc';
 
-    // Build row link
-    public function redirectLink(mixed $row): string
-    {
-        $link = $this->link;
+		return ['column' => $header['sortBy'] ?? $header['key'], 'direction' => $direction];
+	}
 
-        // Transform from `route()` pattern
-        $link = Str::of($link)->replace('%5B', '{')->replace('%5D', '}');
+	// Build row link
+	public function redirectLink(mixed $row): string
+	{
+		$link = $this->link;
 
-        // Extract tokens like {id}, {city.name} ...
-        $tokens = Str::of($link)->matchAll('/\{(.*?)\}/');
+		// Transform from `route()` pattern
+		$link = Str::of($link)->replace('%5B', '{')->replace('%5D', '}');
 
-        // Replace tokens by actual row values
-        $tokens->each(function (string $token) use ($row, &$link) {
-            $link = Str::of($link)->replace("{" . $token . "}", data_get($row, $token))->toString();
-        });
+		// Extract tokens like {id}, {city.name} ...
+		$tokens = Str::of($link)->matchAll('/\{(.*?)\}/');
 
-        return $link;
-    }
+		// Replace tokens by actual row values
+		$tokens->each(function (string $token) use ($row, &$link) {
+			$link = Str::of($link)->replace("{" . $token . "}", data_get($row, $token))->toString();
+		});
 
-    public function rowClasses(mixed $row): ?string
-    {
-        $classes = [];
+		return $link;
+	}
 
-        foreach ($this->rowDecoration as $class => $condition) {
-            if ($condition($row)) {
-                $classes[] = $class;
-            }
-        }
+	public function rowClasses(mixed $row): ?string
+	{
+		$classes = [];
 
-        return Arr::join($classes, ' ');
-    }
+		foreach ($this->rowDecoration as $class => $condition) {
+			if ($condition($row)) {
+				$classes[] = $class;
+			}
+		}
 
-    public function cellClasses(mixed $row, array $header): ?string
-    {
-        $classes = Str::of($header['class'] ?? '')->explode(' ')->all();
+		return Arr::join($classes, ' ');
+	}
 
-        foreach ($this->cellDecoration[$header['key']] ?? [] as $class => $condition) {
-            if ($condition($row)) {
-                $classes[] = $class;
-            }
-        }
+	public function cellClasses(mixed $row, array $header): ?string
+	{
+		$classes = Str::of($header['class'] ?? '')->explode(' ')->all();
 
-        return Arr::join($classes, ' ');
-    }
+		foreach ($this->cellDecoration[$header['key']] ?? [] as $class => $condition) {
+			if ($condition($row)) {
+				$classes[] = $class;
+			}
+		}
 
-    public function selectableModifier(): string
-    {
-        return is_string($this->getAllIds()[0] ?? null) ? "" : ".number";
-    }
+		return Arr::join($classes, ' ');
+	}
 
-    public function getKeyValue($row, $key): mixed
-    {
-        $value = data_get($row, $this->$key);
+	public function selectableModifier(): string
+	{
+		return is_string($this->getAllIds()[0] ?? null) ? "" : ".number";
+	}
 
-        return is_numeric($value) && ! str($value)->startsWith('0') ? $value : "'$value'";
-    }
+	public function getKeyValue($row, $key): mixed
+	{
+		$value = data_get($row, $this->$key);
 
-    public function render(): View|Closure|string
-    {
-        return <<<'HTML'
+		return is_numeric($value) && ! str($value)->startsWith('0') ? $value : "'$value'";
+	}
+
+	public function render(): View|Closure|string
+	{
+		return <<<'HTML'
                 <div x-data="{
                                 selection: @entangle($attributes->wire('model')),
                                 pageIds: {{ json_encode($getAllIds()) }},
@@ -450,5 +452,5 @@ class Table extends Component
                     @endif
                 </div>
             HTML;
-    }
+	}
 }

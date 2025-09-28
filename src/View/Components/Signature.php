@@ -8,44 +8,46 @@ use Illuminate\View\Component;
 
 class Signature extends Component
 {
-    public string $uuid;
+	public string $uuid;
 
-    public function __construct(
-        public ?string $id = null,
-        public ?string $height = '250',
-        public ?string $clearText = 'Clear',
-        public ?string $hint = null,
-        public ?string $hintClass = 'fieldset-label text-xs pt-1',
-        public ?array $config = [],
-        public ?string $clearBtnStyle = null,
+	private static int $counter = 0;
 
-        // Validations
-        public ?string $errorClass = 'text-error text-xs pt-1',
-        public ?string $errorField = null,
-        public ?bool $omitError = false,
-        public ?bool $firstErrorOnly = false,
-    ) {
-        $this->uuid = "mary" . md5(serialize($this)) . $id;
-    }
+	public function __construct(
+		public ?string $id = null,
+		public ?string $height = '250',
+		public ?string $clearText = 'Clear',
+		public ?string $hint = null,
+		public ?string $hintClass = 'fieldset-label text-xs pt-1',
+		public ?array $config = [],
+		public ?string $clearBtnStyle = null,
 
-    public function modelName(): ?string
-    {
-        return $this->attributes->whereStartsWith('wire:model')->first();
-    }
+		// Validations
+		public ?string $errorClass = 'text-error text-xs pt-1',
+		public ?string $errorField = null,
+		public ?bool $omitError = false,
+		public ?bool $firstErrorOnly = false,
+	) {
+		$this->uuid = "signature-" . ++self::$counter;
+	}
 
-    public function errorFieldName(): ?string
-    {
-        return $this->errorField ?? $this->modelName();
-    }
+	public function modelName(): ?string
+	{
+		return $this->attributes->whereStartsWith('wire:model')->first();
+	}
 
-    public function setup(): string
-    {
-        return json_encode(array_merge([], $this->config));
-    }
+	public function errorFieldName(): ?string
+	{
+		return $this->errorField ?? $this->modelName();
+	}
 
-    public function render(): View|Closure|string
-    {
-        return <<<'HTML'
+	public function setup(): string
+	{
+		return json_encode(array_merge([], $this->config));
+	}
+
+	public function render(): View|Closure|string
+	{
+		return <<<'HTML'
                 <div>
                     <div
                         x-data="{
@@ -113,5 +115,5 @@ class Signature extends Component
                     @endif
                 </div>
             HTML;
-    }
+	}
 }

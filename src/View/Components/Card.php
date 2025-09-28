@@ -8,37 +8,39 @@ use Illuminate\View\Component;
 
 class Card extends Component
 {
-    public string $uuid;
+	public string $uuid;
 
-    public function __construct(
-        public ?string $id = null,
-        public ?string $title = null,
-        public ?string $subtitle = null,
-        public ?bool $separator = false,
-        public ?bool $shadow = false,
-        public ?string $progressIndicator = null,
+	private static int $counter = 0;
 
-        // Slots
-        public mixed $menu = null,
-        public mixed $actions = null,
-        public mixed $figure = null,
-        public ?string $bodyClass = 'null'
-    ) {
-        $this->uuid = "mary" . md5(serialize($this)) . $id;
-    }
+	public function __construct(
+		public ?string $id = null,
+		public ?string $title = null,
+		public ?string $subtitle = null,
+		public ?bool $separator = false,
+		public ?bool $shadow = false,
+		public ?string $progressIndicator = null,
 
-    public function progressTarget(): ?string
-    {
-        if ($this->progressIndicator == 1) {
-            return $this->attributes->whereStartsWith('progress-indicator')->first();
-        }
+		// Slots
+		public mixed $menu = null,
+		public mixed $actions = null,
+		public mixed $figure = null,
+		public ?string $bodyClass = 'null'
+	) {
+		$this->uuid = "card-" . ++self::$counter;
+	}
 
-        return $this->progressIndicator;
-    }
+	public function progressTarget(): ?string
+	{
+		if ($this->progressIndicator == 1) {
+			return $this->attributes->whereStartsWith('progress-indicator')->first();
+		}
 
-    public function render(): View|Closure|string
-    {
-        return <<<'HTML'
+		return $this->progressIndicator;
+	}
+
+	public function render(): View|Closure|string
+	{
+		return <<<'HTML'
                 <div
                     {{
                         $attributes
@@ -108,5 +110,5 @@ class Card extends Component
                     @endif
                 </div>
             HTML;
-    }
+	}
 }

@@ -8,17 +8,19 @@ use Illuminate\View\Component;
 
 class Chart extends Component
 {
-    public string $uuid;
+	public string $uuid;
 
-    public function __construct(
-        public ?string $id = null,
-    ) {
-        $this->uuid = "mary" . md5(serialize($this)) . $id;
-    }
+	private static int $counter = 0;
 
-    public function render(): View|Closure|string
-    {
-        return <<<'HTML'
+	public function __construct(
+		public ?string $id = null,
+	) {
+		$this->uuid = "chart-" . ++self::$counter;
+	}
+
+	public function render(): View|Closure|string
+	{
+		return <<<'HTML'
                 <div
                     wire:key="{{ $uuid }}-{{ rand() }}"
                     x-data="{
@@ -33,5 +35,5 @@ class Chart extends Component
                     <canvas x-ref="chart"></canvas>
                 </div>
             HTML;
-    }
+	}
 }

@@ -8,26 +8,28 @@ use Illuminate\View\Component;
 
 class Spotlight extends Component
 {
-    public string $uuid;
+	public string $uuid;
 
-    public function __construct(
-        public ?string $id = null,
-        public ?string $shortcut = "meta.g",
-        public ?string $searchText = "Search ...",
-        public ?string $noResultsText = "Nothing found.",
-        public ?string $url = null,
-        public ?string $fallbackAvatar = null,
+	private static int $counter = 0;
 
-        // Slots
-        public mixed $append = null
-    ) {
-        $this->uuid = "mary" . md5(serialize($this)) . $id;
-        $this->url = $this->url ?? route('mary.spotlight', absolute: false);
-    }
+	public function __construct(
+		public ?string $id = null,
+		public ?string $shortcut = "meta.g",
+		public ?string $searchText = "Search ...",
+		public ?string $noResultsText = "Nothing found.",
+		public ?string $url = null,
+		public ?string $fallbackAvatar = null,
 
-    public function render(): View|Closure|string
-    {
-        return <<<'HTML'
+		// Slots
+		public mixed $append = null
+	) {
+		$this->uuid = "spotlight-" . ++self::$counter;
+		$this->url = $this->url ?? route('mary.spotlight', absolute: false);
+	}
+
+	public function render(): View|Closure|string
+	{
+		return <<<'HTML'
                 <div
                     x-data="
                         {
@@ -203,5 +205,5 @@ class Spotlight extends Component
                     </x-modal>
                 </div>
             HTML;
-    }
+	}
 }

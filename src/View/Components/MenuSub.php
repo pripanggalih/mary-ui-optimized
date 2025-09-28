@@ -8,27 +8,29 @@ use Illuminate\View\Component;
 
 class MenuSub extends Component
 {
-    public string $uuid;
+	public string $uuid;
 
-    public function __construct(
-        public ?string $id = null,
-        public ?string $title = null,
-        public ?string $icon = null,
-        public ?string $iconClasses = null,
-        public bool $open = false,
-        public ?bool $hidden = false,
-        public ?bool $disabled = false,
-    ) {
-        $this->uuid = "mary" . md5(serialize($this)) . $id;
-    }
+	private static int $counter = 0;
 
-    public function render(): View|Closure|string
-    {
-        if ($this->hidden === true) {
-            return '';
-        }
+	public function __construct(
+		public ?string $id = null,
+		public ?string $title = null,
+		public ?string $icon = null,
+		public ?string $iconClasses = null,
+		public bool $open = false,
+		public ?bool $hidden = false,
+		public ?bool $disabled = false,
+	) {
+		$this->uuid = "menusub-" . ++self::$counter;
+	}
 
-        return <<<'BLADE'
+	public function render(): View|Closure|string
+	{
+		if ($this->hidden === true) {
+			return '';
+		}
+
+		return <<<'BLADE'
                 @aware(['activeBgColor' => 'bg-base-300'])
 
                 @php
@@ -69,5 +71,5 @@ class MenuSub extends Component
                 </li>
                 @endif
                 BLADE;
-    }
+	}
 }

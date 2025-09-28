@@ -8,18 +8,20 @@ use Illuminate\View\Component;
 
 class Loading extends Component
 {
-    public string $uuid;
+	public string $uuid;
 
-    public function __construct(
-        public ?string $id = null,
-    ) {
-        $this->uuid = "mary" . md5(serialize($this)) . $id;
-    }
+	public static int $counter = 0;
 
-    public function render(): View|Closure|string
-    {
-        return <<<'HTML'
+	public function __construct(
+		public ?string $id = null,
+	) {
+		$this->uuid = "loading-" . ++self::$counter;
+	}
+
+	public function render(): View|Closure|string
+	{
+		return <<<'HTML'
                 <span {{ $attributes->class("loading") }}></span>
             HTML;
-    }
+	}
 }

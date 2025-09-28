@@ -9,25 +9,27 @@ use Illuminate\View\Component;
 
 class Tab extends Component
 {
-    public string $uuid;
+	public string $uuid;
 
-    public function __construct(
-        public ?string $id = null,
-        public ?string $name = null,
-        public ?string $label = null,
-        public ?string $icon = null,
-        public bool $disabled = false,
-        public bool $hidden = false,
-    ) {
-        $this->uuid = "mary" . md5(serialize($this)) . $id;
-    }
+	private static int $counter = 0;
 
-    public function tabLabel(string $label): string
-    {
-        $fromLabel = $this->label ? $this->label : $label;
+	public function __construct(
+		public ?string $id = null,
+		public ?string $name = null,
+		public ?string $label = null,
+		public ?string $icon = null,
+		public bool $disabled = false,
+		public bool $hidden = false,
+	) {
+		$this->uuid = "tab-" . ++self::$counter;
+	}
 
-        if ($this->icon) {
-            return Blade::render("
+	public function tabLabel(string $label): string
+	{
+		$fromLabel = $this->label ? $this->label : $label;
+
+		if ($this->icon) {
+			return Blade::render("
                 <x-mary-icon name='" . $this->icon . "' @class([
                 'me-2',
                 'whitespace-nowrap',
@@ -38,9 +40,9 @@ class Tab extends Component
                     </x-slot:label>
                 </x-mary-icon>
             ");
-        }
+		}
 
-        return Blade::render("
+		return Blade::render("
             <div @class([
                 'whitespace-nowrap',
                 'text-base-content/30 cursor-not-allowed' => '$this->disabled'
@@ -48,11 +50,11 @@ class Tab extends Component
                 {$fromLabel}
             </div>
         ");
-    }
+	}
 
-    public function render(): View|Closure|string
-    {
-        return <<<'HTML'
+	public function render(): View|Closure|string
+	{
+		return <<<'HTML'
                     <a
                         class="hidden tab"
                         :class="{ 'tab-active': selected === '{{ $name }}' }"
@@ -74,5 +76,5 @@ class Tab extends Component
                         {{ $slot }}
                     </div>
                 HTML;
-    }
+	}
 }

@@ -8,61 +8,63 @@ use Illuminate\View\Component;
 
 class Tags extends Component
 {
-    public string $uuid;
+	public string $uuid;
 
-    public function __construct(
-        public ?string $id = null,
-        public ?string $label = null,
-        public ?string $hint = null,
-        public ?string $hintClass = 'fieldset-label',
-        public ?string $icon = null,
-        public ?string $iconRight = null,
-        public ?bool $inline = false,
-        public ?bool $clearable = false,
-        public ?string $prefix = null,
-        public ?string $suffix = null,
+	private static int $counter = 0;
 
-        // Slots
-        public mixed $prepend = null,
-        public mixed $append = null,
+	public function __construct(
+		public ?string $id = null,
+		public ?string $label = null,
+		public ?string $hint = null,
+		public ?string $hintClass = 'fieldset-label',
+		public ?string $icon = null,
+		public ?string $iconRight = null,
+		public ?bool $inline = false,
+		public ?bool $clearable = false,
+		public ?string $prefix = null,
+		public ?string $suffix = null,
 
-        // Validations
-        public ?string $errorField = null,
-        public ?string $errorClass = 'text-error',
-        public ?bool $omitError = false,
-        public ?bool $firstErrorOnly = false,
-    ) {
-        $this->uuid = "mary" . md5(serialize($this)) . $id;
-    }
+		// Slots
+		public mixed $prepend = null,
+		public mixed $append = null,
 
-    public function modelName(): ?string
-    {
-        return $this->attributes->whereStartsWith('wire:model')->first();
-    }
+		// Validations
+		public ?string $errorField = null,
+		public ?string $errorClass = 'text-error',
+		public ?bool $omitError = false,
+		public ?bool $firstErrorOnly = false,
+	) {
+		$this->uuid = "tags-" . ++self::$counter;
+	}
 
-    public function errorFieldName(): ?string
-    {
-        return $this->errorField ?? $this->modelName();
-    }
+	public function modelName(): ?string
+	{
+		return $this->attributes->whereStartsWith('wire:model')->first();
+	}
 
-    public function isReadonly(): bool
-    {
-        return $this->attributes->has('readonly') && $this->attributes->get('readonly') == true;
-    }
+	public function errorFieldName(): ?string
+	{
+		return $this->errorField ?? $this->modelName();
+	}
 
-    public function isDisabled(): bool
-    {
-        return $this->attributes->has('disabled') && $this->attributes->get('disabled') == true;
-    }
+	public function isReadonly(): bool
+	{
+		return $this->attributes->has('readonly') && $this->attributes->get('readonly') == true;
+	}
 
-    public function isRequired(): bool
-    {
-        return $this->attributes->has('required') && $this->attributes->get('required') == true;
-    }
+	public function isDisabled(): bool
+	{
+		return $this->attributes->has('disabled') && $this->attributes->get('disabled') == true;
+	}
 
-    public function render(): View|Closure|string
-    {
-        return <<<'BLADE'
+	public function isRequired(): bool
+	{
+		return $this->attributes->has('required') && $this->attributes->get('required') == true;
+	}
+
+	public function render(): View|Closure|string
+	{
+		return <<<'BLADE'
             <div x-data="{
                     tags: @entangle($attributes->wire('model')),
                     tag: null,
@@ -257,5 +259,5 @@ class Tags extends Component
                 </fieldset>
             </div>
         BLADE;
-    }
+	}
 }

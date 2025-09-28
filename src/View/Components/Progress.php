@@ -8,20 +8,22 @@ use Illuminate\View\Component;
 
 class Progress extends Component
 {
-    public string $uuid;
+	public string $uuid;
 
-    public function __construct(
-        public ?string $id = null,
-        public ?float $value = 0,
-        public ?float $max = 100,
-        public ?bool $indeterminate = false,
-    ) {
-        $this->uuid = "mary" . md5(serialize($this)) . $id;
-    }
+	private static int $counter = 0;
 
-    public function render(): View|Closure|string
-    {
-        return <<<'HTML'
+	public function __construct(
+		public ?string $id = null,
+		public ?float $value = 0,
+		public ?float $max = 100,
+		public ?bool $indeterminate = false,
+	) {
+		$this->uuid = "progress-" . ++self::$counter;
+	}
+
+	public function render(): View|Closure|string
+	{
+		return <<<'HTML'
                 <progress
                     {{ $attributes->class("progress") }}
 
@@ -31,5 +33,5 @@ class Progress extends Component
                     @endif
                 ></progress>
             HTML;
-    }
+	}
 }

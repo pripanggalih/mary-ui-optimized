@@ -8,18 +8,20 @@ use Illuminate\View\Component;
 
 class Accordion extends Component
 {
-    public string $uuid;
+	public string $uuid;
 
-    public function __construct(
-        public ?string $id = null,
-        public ?bool $noJoin = false,
-    ) {
-        $this->uuid = "mary" . md5(serialize($this)) . $id;
-    }
+	private static int $counter = 0;
 
-    public function render(): View|Closure|string
-    {
-        return <<<'BLADE'
+	public function __construct(
+		public ?string $id = null,
+		public ?bool $noJoin = false,
+	) {
+		$this->uuid = "accordion-" . ++self::$counter;
+	}
+
+	public function render(): View|Closure|string
+	{
+		return <<<'BLADE'
                 <div
                     x-data="{ model: @entangle($attributes->wire('model')) }"
                     {{ $attributes->whereDoesntStartWith('wire:model')->merge(['class' => ($noJoin ? '' : 'join join-vertical w-full')]) }}
@@ -28,5 +30,5 @@ class Accordion extends Component
                         {{ $slot }}
                 </div>
             BLADE;
-    }
+	}
 }

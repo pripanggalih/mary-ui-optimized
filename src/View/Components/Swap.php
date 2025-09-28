@@ -8,22 +8,24 @@ use Illuminate\View\Component;
 
 class Swap extends Component
 {
-    public string $uuid;
+	public string $uuid;
 
-    public function __construct(
-        public ?string $id = null,
-        public ?string $true = null,
-        public ?string $false = null,
-        public ?string $trueIcon = 'o-sun',
-        public ?string $falseIcon = 'o-moon',
-        public ?string $iconSize = "h-5 w-5",
-    ) {
-        $this->uuid = "mary" . md5(serialize($this)) . $id;
-    }
+	private static int $counter = 0;
 
-    public function render(): View|Closure|string
-    {
-        return <<<'BLADE'
+	public function __construct(
+		public ?string $id = null,
+		public ?string $true = null,
+		public ?string $false = null,
+		public ?string $trueIcon = 'o-sun',
+		public ?string $falseIcon = 'o-moon',
+		public ?string $iconSize = "h-5 w-5",
+	) {
+		$this->uuid = "swap-" . ++self::$counter;
+	}
+
+	public function render(): View|Closure|string
+	{
+		return <<<'BLADE'
                 <label
                     for="{{ $uuid }}"
                     {{ $attributes->whereDoesntStartWith('wire:model') }}>
@@ -68,5 +70,5 @@ class Swap extends Component
                     @endif
                 </label>
             BLADE;
-    }
+	}
 }

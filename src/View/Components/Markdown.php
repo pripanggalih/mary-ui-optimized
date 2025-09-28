@@ -8,81 +8,83 @@ use Illuminate\View\Component;
 
 class Markdown extends Component
 {
-    public string $uuid;
+	public string $uuid;
 
-    public string $uploadUrl;
+	private static int $counter = 0;
 
-    public function __construct(
-        public ?string $id = null,
-        public ?string $label = null,
-        public ?string $hint = null,
-        public ?string $hintClass = 'fieldset-label',
-        public ?string $disk = 'public',
-        public ?string $folder = 'markdown',
-        public ?array $config = [],
+	public string $uploadUrl;
 
-        // Validations
-        public ?string $errorField = null,
-        public ?string $errorClass = 'text-error',
-        public ?bool $omitError = false,
-        public ?bool $firstErrorOnly = false,
-    ) {
-        $this->uuid = "mary" . md5(serialize($this)) . $id;
-        $this->uploadUrl = route('mary.upload', absolute: false);
-    }
+	public function __construct(
+		public ?string $id = null,
+		public ?string $label = null,
+		public ?string $hint = null,
+		public ?string $hintClass = 'fieldset-label',
+		public ?string $disk = 'public',
+		public ?string $folder = 'markdown',
+		public ?array $config = [],
 
-    public function modelName(): ?string
-    {
-        return $this->attributes->whereStartsWith('wire:model')->first();
-    }
+		// Validations
+		public ?string $errorField = null,
+		public ?string $errorClass = 'text-error',
+		public ?bool $omitError = false,
+		public ?bool $firstErrorOnly = false,
+	) {
+		$this->uuid = "md-" . ++self::$counter;
+		$this->uploadUrl = route('mary.upload', absolute: false);
+	}
 
-    public function errorFieldName(): ?string
-    {
-        return $this->errorField ?? $this->modelName();
-    }
+	public function modelName(): ?string
+	{
+		return $this->attributes->whereStartsWith('wire:model')->first();
+	}
 
-    public function setup(): string
-    {
-        $setup = array_merge([
-            'spellChecker' => false,
-            'autoSave' => false,
-            'uploadImage' => true,
-            'imageAccept' => 'image/png, image/jpeg, image/gif, image/avif',
-            'toolbar' => [
-                'heading',
-                'bold',
-                'italic',
-                'strikethrough',
-                '|',
-                'code',
-                'quote',
-                'unordered-list',
-                'ordered-list',
-                'horizontal-rule',
-                '|',
-                'link',
-                'upload-image',
-                'table',
-                '|',
-                'preview',
-                'side-by-side'
-            ],
-        ], $this->config);
+	public function errorFieldName(): ?string
+	{
+		return $this->errorField ?? $this->modelName();
+	}
 
-        // Table default CSS class `.table` breaks the layout.
-        // Here is a workaround
-        $table = "{ 'title' : 'Table', 'name' : 'myTable', 'action' : EasyMDE.drawTable, 'className' : 'fa fa-table' }";
+	public function setup(): string
+	{
+		$setup = array_merge([
+			'spellChecker' => false,
+			'autoSave' => false,
+			'uploadImage' => true,
+			'imageAccept' => 'image/png, image/jpeg, image/gif, image/avif',
+			'toolbar' => [
+				'heading',
+				'bold',
+				'italic',
+				'strikethrough',
+				'|',
+				'code',
+				'quote',
+				'unordered-list',
+				'ordered-list',
+				'horizontal-rule',
+				'|',
+				'link',
+				'upload-image',
+				'table',
+				'|',
+				'preview',
+				'side-by-side'
+			],
+		], $this->config);
 
-        return str(json_encode($setup))
-            ->replace("\"", "'")
-            ->trim('{}')
-            ->replace("'table'", $table)
-            ->toString();
-    }
+		// Table default CSS class `.table` breaks the layout.
+		// Here is a workaround
+		$table = "{ 'title' : 'Table', 'name' : 'myTable', 'action' : EasyMDE.drawTable, 'className' : 'fa fa-table' }";
 
-    public function render(): View|Closure|string
-    {
-        return <<<'HTML'
+		return str(json_encode($setup))
+			->replace("\"", "'")
+			->trim('{}')
+			->replace("'table'", $table)
+			->toString();
+	}
+
+	public function render(): View|Closure|string
+	{
+		return <<<'HTML'
             <div>
                 <fieldset class="fieldset py-0">
                     {{-- STANDARD LABEL --}}
@@ -177,5 +179,5 @@ class Markdown extends Component
                 </fieldset>
             </div>
             HTML;
-    }
+	}
 }

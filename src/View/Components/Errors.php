@@ -8,21 +8,23 @@ use Illuminate\View\Component;
 
 class Errors extends Component
 {
-    public string $uuid;
+	public string $uuid;
 
-    public function __construct(
-        public ?string $id = null,
-        public ?string $title = null,
-        public ?string $description = null,
-        public ?string $icon = 'o-x-circle',
-        public ?array $only = [],
-    ) {
-        $this->uuid = "mary" . md5(serialize($this)) . $id;
-    }
+	private static int $counter = 0;
 
-    public function render(): View|Closure|string
-    {
-        return <<<'BLADE'
+	public function __construct(
+		public ?string $id = null,
+		public ?string $title = null,
+		public ?string $description = null,
+		public ?string $icon = 'o-x-circle',
+		public ?array $only = [],
+	) {
+		$this->uuid = "errors-" . ++self::$counter;
+	}
+
+	public function render(): View|Closure|string
+	{
+		return <<<'BLADE'
                 <div>
                     @if ($errors->any())
                         <div {{ $attributes->class(["alert alert-error rounded rounded-sm"]) }} >
@@ -53,5 +55,5 @@ class Errors extends Component
                     @endif
             </div>
             BLADE;
-    }
+	}
 }

@@ -8,33 +8,35 @@ use Illuminate\View\Component;
 
 class Alert extends Component
 {
-    public string $uuid;
+	public string $uuid;
 
-    /**
-     * @param ?string  $title  The title of the alert, displayed in bold.
-     * @param ?string  $icon  The icon displayed at the beginning of the alert.
-     * @param ?string  $description  A short description under the title.
-     * @param ?bool  $shadow  Whether to apply a shadow effect to the alert.
-     * @param ?bool  $dismissible  Whether the alert can be dismissed by the user.
-     * @slot  mixed  $actions  Slots for actionable elements like buttons or links.
-     */
-    public function __construct(
-        public ?string $id = null,
-        public ?string $title = null,
-        public ?string $icon = null,
-        public ?string $description = null,
-        public ?bool $shadow = false,
-        public ?bool $dismissible = false,
+	private static int $counter = 0;
 
-        // Slots
-        public mixed $actions = null
-    ) {
-        $this->uuid = "mary" . md5(serialize($this)) . $id;
-    }
+	/**
+	 * @param ?string  $title  The title of the alert, displayed in bold.
+	 * @param ?string  $icon  The icon displayed at the beginning of the alert.
+	 * @param ?string  $description  A short description under the title.
+	 * @param ?bool  $shadow  Whether to apply a shadow effect to the alert.
+	 * @param ?bool  $dismissible  Whether the alert can be dismissed by the user.
+	 * @slot  mixed  $actions  Slots for actionable elements like buttons or links.
+	 */
+	public function __construct(
+		public ?string $id = null,
+		public ?string $title = null,
+		public ?string $icon = null,
+		public ?string $description = null,
+		public ?bool $shadow = false,
+		public ?bool $dismissible = false,
 
-    public function render(): View|Closure|string
-    {
-        return <<<'BLADE'
+		// Slots
+		public mixed $actions = null
+	) {
+		$this->uuid = "alert-" . ++self::$counter;
+	}
+
+	public function render(): View|Closure|string
+	{
+		return <<<'BLADE'
                 <div
                     wire:key="{{ $uuid }}"
                     {{ $attributes->whereDoesntStartWith('class') }}
@@ -63,5 +65,5 @@ class Alert extends Component
                     @endif
                 </div>
             BLADE;
-    }
+	}
 }

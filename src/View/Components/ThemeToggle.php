@@ -8,26 +8,28 @@ use Illuminate\View\Component;
 
 class ThemeToggle extends Component
 {
-    public string $uuid;
+	public string $uuid;
 
-    public function __construct(
-        public ?string $id = null,
-        public ?string $value = null,
-        public ?string $light = "Light",
-        public ?string $dark = "Dark",
-        public ?string $lightTheme = "light",
-        public ?string $darkTheme = "dark",
-        public ?string $lightClass = "light",
-        public ?string $darkClass = "dark",
-        public ?bool $withLabel = false,
+	private static int $counter = 0;
 
-    ) {
-        $this->uuid = "mary" . md5(serialize($this)) . $id;
-    }
+	public function __construct(
+		public ?string $id = null,
+		public ?string $value = null,
+		public ?string $light = "Light",
+		public ?string $dark = "Dark",
+		public ?string $lightTheme = "light",
+		public ?string $darkTheme = "dark",
+		public ?string $lightClass = "light",
+		public ?string $darkClass = "dark",
+		public ?bool $withLabel = false,
 
-    public function render(): View|Closure|string
-    {
-        return <<<'HTML'
+	) {
+		$this->uuid = "theme-toggle-" . ++self::$counter;
+	}
+
+	public function render(): View|Closure|string
+	{
+		return <<<'HTML'
                 <div>
                     <label
                         for="{{ $uuid }}"
@@ -68,5 +70,5 @@ class ThemeToggle extends Component
                     document.documentElement.setAttribute("class", localStorage.getItem("mary-class")?.replaceAll("\"", ""))
                 </script>
             HTML;
-    }
+	}
 }

@@ -8,25 +8,27 @@ use Illuminate\View\Component;
 
 class Collapse extends Component
 {
-    public string $uuid;
+	public string $uuid;
 
-    public function __construct(
-        public ?string $id = null,
-        public ?string $name = null,
-        public ?bool $collapsePlusMinus = false,
-        public ?bool $separator = false,
-        public ?bool $noIcon = false,
+	private static int $counter = 0;
 
-        // Slots
-        public mixed $heading = null,
-        public mixed $content = null,
-    ) {
-        $this->uuid = "mary" . md5(serialize($this)) . $id;
-    }
+	public function __construct(
+		public ?string $id = null,
+		public ?string $name = null,
+		public ?bool $collapsePlusMinus = false,
+		public ?bool $separator = false,
+		public ?bool $noIcon = false,
 
-    public function render(): View|Closure|string
-    {
-        return <<<'HTML'
+		// Slots
+		public mixed $heading = null,
+		public mixed $content = null,
+	) {
+		$this->uuid = "collapse-" . ++self::$counter;
+	}
+
+	public function render(): View|Closure|string
+	{
+		return <<<'HTML'
                 @aware(['noJoin' => null])
 
                 <div
@@ -67,5 +69,5 @@ class Collapse extends Component
                         </div>
                 </div>
             HTML;
-    }
+	}
 }

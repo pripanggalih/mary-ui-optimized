@@ -9,39 +9,41 @@ use Jfcherng\Diff\DiffHelper;
 
 class Diff extends Component
 {
-    public string $uuid;
+	public string $uuid;
 
-    public function __construct(
-        public ?string $id = null,
-        public string $old = '',
-        public string $new = '',
-        public string $fileName = 'payload.json',
-        public ?array $config = []
-    ) {
-        $this->uuid = "mary" . md5(serialize($this)) . $id;
-    }
+	private static int $counter = 0;
 
-    public function setup(): string
-    {
-        return json_encode(array_merge([
-            'drawFileList' => false,
-            'matching' => 'lines',
-            'outputFormat' => 'side-by-side',
-            'synchronisedScroll' => true,
-            'fileContentToggle' => false,
-        ], $this->config));
-    }
+	public function __construct(
+		public ?string $id = null,
+		public string $old = '',
+		public string $new = '',
+		public string $fileName = 'payload.json',
+		public ?array $config = []
+	) {
+		$this->uuid = "diff-" . ++self::$counter;
+	}
 
-    public function diff(): string
-    {
-        $diff = DiffHelper::calculate($this->old . PHP_EOL, $this->new . PHP_EOL);
+	public function setup(): string
+	{
+		return json_encode(array_merge([
+			'drawFileList' => false,
+			'matching' => 'lines',
+			'outputFormat' => 'side-by-side',
+			'synchronisedScroll' => true,
+			'fileContentToggle' => false,
+		], $this->config));
+	}
 
-        return "--- {$this->fileName}\n+++ {$this->fileName}\n" . $diff;
-    }
+	public function diff(): string
+	{
+		$diff = DiffHelper::calculate($this->old . PHP_EOL, $this->new . PHP_EOL);
 
-    public function render(): View|Closure|string
-    {
-        return <<<'HTML'
+		return "--- {$this->fileName}\n+++ {$this->fileName}\n" . $diff;
+	}
+
+	public function render(): View|Closure|string
+	{
+		return <<<'HTML'
             <div
                 x-data="{
                         init(){
@@ -54,5 +56,5 @@ class Diff extends Component
                 </div>
             </div>
         HTML;
-    }
+	}
 }

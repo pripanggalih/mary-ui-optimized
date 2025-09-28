@@ -8,39 +8,41 @@ use Illuminate\View\Component;
 
 class Pin extends Component
 {
-    public string $uuid;
+	public string $uuid;
 
-    public function __construct(
-        public int $size,
-        public ?string $id = null,
-        public ?bool $numeric = false,
-        public ?bool $hide = false,
-        public ?string $hideType = "disc",
-        public ?bool $noGap = false,
+	private static int $counter = 0;
 
-        // Validations
-        public ?string $errorField = null,
-        public ?string $errorClass = 'text-error text-xs pt-2',
-        public ?bool $omitError = false,
-        public ?bool $firstErrorOnly = false,
+	public function __construct(
+		public int $size,
+		public ?string $id = null,
+		public ?bool $numeric = false,
+		public ?bool $hide = false,
+		public ?string $hideType = "disc",
+		public ?bool $noGap = false,
 
-    ) {
-        $this->uuid = "mary" . md5(serialize($this)) . $id;
-    }
+		// Validations
+		public ?string $errorField = null,
+		public ?string $errorClass = 'text-error text-xs pt-2',
+		public ?bool $omitError = false,
+		public ?bool $firstErrorOnly = false,
 
-    public function modelName(): ?string
-    {
-        return $this->attributes->whereStartsWith('wire:model')->first();
-    }
+	) {
+		$this->uuid = "pin-" . ++self::$counter;
+	}
 
-    public function errorFieldName(): ?string
-    {
-        return $this->errorField ?? $this->modelName();
-    }
+	public function modelName(): ?string
+	{
+		return $this->attributes->whereStartsWith('wire:model')->first();
+	}
 
-    public function render(): View|Closure|string
-    {
-        return <<<'HTML'
+	public function errorFieldName(): ?string
+	{
+		return $this->errorField ?? $this->modelName();
+	}
+
+	public function render(): View|Closure|string
+	{
+		return <<<'HTML'
                 <div>
                     <div
                         x-data="{
@@ -136,5 +138,5 @@ class Pin extends Component
                     </div>
                 </div>
             HTML;
-    }
+	}
 }

@@ -8,21 +8,23 @@ use Illuminate\View\Component;
 
 class Steps extends Component
 {
-    public string $uuid;
+	public string $uuid;
 
-    public function __construct(
-        public ?string $id = null,
-        public bool $vertical = false,
-        public ?string $stepsColor = 'step-neutral',
-        public ?string $stepperClasses = null
+	private static int $counter = 0;
 
-    ) {
-        $this->uuid = "mary" . md5(serialize($this)) . $id;
-    }
+	public function __construct(
+		public ?string $id = null,
+		public bool $vertical = false,
+		public ?string $stepsColor = 'step-neutral',
+		public ?string $stepperClasses = null
 
-    public function render(): View|Closure|string
-    {
-        return <<<'BLADE'
+	) {
+		$this->uuid = "steps-" . ++self::$counter;
+	}
+
+	public function render(): View|Closure|string
+	{
+		return <<<'BLADE'
                 <div
                         x-data="{
                                 steps: [],
@@ -60,5 +62,5 @@ class Steps extends Component
                         <span class="hidden step-primary step-error step-success step-neutral step-info step-accent"></span>
                     </div>
             BLADE;
-    }
+	}
 }

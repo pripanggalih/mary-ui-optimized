@@ -8,27 +8,29 @@ use Illuminate\View\Component;
 
 class Hr extends Component
 {
-    public string $uuid;
+	public string $uuid;
 
-    public function __construct(
-        public ?string $id = null,
-        public ?string $target = null,
-    ) {
-        $this->uuid = "mary" . md5(serialize($this)) . $id;
-    }
+	private static int $counter = 0;
 
-    public function progressTarget(): ?string
-    {
-        if ($this->target == 1) {
-            return $this->attributes->whereStartsWith('target')->first();
-        }
+	public function __construct(
+		public ?string $id = null,
+		public ?string $target = null,
+	) {
+		$this->uuid = "hr-" . ++self::$counter;
+	}
 
-        return $this->target;
-    }
+	public function progressTarget(): ?string
+	{
+		if ($this->target == 1) {
+			return $this->attributes->whereStartsWith('target')->first();
+		}
 
-    public function render(): View|Closure|string
-    {
-        return <<<'HTML'
+		return $this->target;
+	}
+
+	public function render(): View|Closure|string
+	{
+		return <<<'HTML'
                 <div class="h-[2px] border-t-[length:var(--border)] border-t-base-content/10 my-5">
                     <progress
                         class="progress progress-primary hidden h-[1px]"
@@ -39,5 +41,5 @@ class Hr extends Component
                         @endif></progress>
                 </div>
             HTML;
-    }
+	}
 }

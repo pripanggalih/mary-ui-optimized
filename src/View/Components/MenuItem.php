@@ -9,65 +9,67 @@ use Illuminate\View\Component;
 
 class MenuItem extends Component
 {
-    public string $uuid;
+	public string $uuid;
 
-    public function __construct(
-        public ?string $id = null,
-        public ?string $title = null,
-        public ?string $icon = null,
-        public ?string $iconClasses = null,
-        public ?string $spinner = null,
-        public ?string $link = null,
-        public ?string $route = null,
-        public ?bool $external = false,
-        public ?bool $noWireNavigate = false,
-        public ?string $badge = null,
-        public ?string $badgeClasses = null,
-        public ?bool $active = false,
-        public ?bool $separator = false,
-        public ?bool $hidden = false,
-        public ?bool $disabled = false,
-        public ?bool $exact = false
-    ) {
-        $this->uuid = "mary" . md5(serialize($this)) . $id;
-    }
+	private static int $counter = 0;
 
-    public function spinnerTarget(): ?string
-    {
-        if ($this->spinner == 1) {
-            return $this->attributes->whereStartsWith('wire:click')->first();
-        }
+	public function __construct(
+		public ?string $id = null,
+		public ?string $title = null,
+		public ?string $icon = null,
+		public ?string $iconClasses = null,
+		public ?string $spinner = null,
+		public ?string $link = null,
+		public ?string $route = null,
+		public ?bool $external = false,
+		public ?bool $noWireNavigate = false,
+		public ?string $badge = null,
+		public ?string $badgeClasses = null,
+		public ?bool $active = false,
+		public ?bool $separator = false,
+		public ?bool $hidden = false,
+		public ?bool $disabled = false,
+		public ?bool $exact = false
+	) {
+		$this->uuid = "menuitem-" . ++self::$counter;
+	}
 
-        return $this->spinner;
-    }
+	public function spinnerTarget(): ?string
+	{
+		if ($this->spinner == 1) {
+			return $this->attributes->whereStartsWith('wire:click')->first();
+		}
 
-    public function routeMatches(): bool
-    {
-        if ($this->link == null) {
-            return false;
-        }
+		return $this->spinner;
+	}
 
-        if ($this->route) {
-            return request()->routeIs($this->route);
-        }
+	public function routeMatches(): bool
+	{
+		if ($this->link == null) {
+			return false;
+		}
 
-        $link = url($this->link ?? '');
-        $route = url(request()->url());
+		if ($this->route) {
+			return request()->routeIs($this->route);
+		}
 
-        if ($link == $route) {
-            return true;
-        }
+		$link = url($this->link ?? '');
+		$route = url(request()->url());
 
-        return ! $this->exact && $this->link != '/' && Str::startsWith($route, $link);
-    }
+		if ($link == $route) {
+			return true;
+		}
 
-    public function render(): View|Closure|string
-    {
-        if ($this->hidden === true) {
-            return '';
-        }
+		return ! $this->exact && $this->link != '/' && Str::startsWith($route, $link);
+	}
 
-        return <<<'BLADE'
+	public function render(): View|Closure|string
+	{
+		if ($this->hidden === true) {
+			return '';
+		}
+
+		return <<<'BLADE'
                 @aware(['activateByRoute' => false, 'activeBgColor' => 'bg-base-300'])
 
                 <li @class(['menu-disabled' => $disabled])>
@@ -123,5 +125,5 @@ class MenuItem extends Component
                     </a>
                 </li>
             BLADE;
-    }
+	}
 }
