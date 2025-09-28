@@ -57,7 +57,7 @@ class Choices extends Component
 		public mixed $prepend = null,
 		public mixed $append = null
 	) {
-		$this->uuid = "choices-" . ++self::$counter;
+		$this->uuid = "choices-" . serialize($this) . $id;
 
 		if (($this->allowAll || $this->compact) && ($this->single || $this->searchable)) {
 			throw new Exception("`allow-all` and `compact` does not work combined with `single` or `searchable`.");

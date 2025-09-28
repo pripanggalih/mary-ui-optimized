@@ -12,8 +12,6 @@ class ChoicesOffline extends Component
 {
 	public string $uuid;
 
-	private static int $counter = 0;
-
 	public function __construct(
 		public ?string $id = null,
 		public ?string $label = null,
@@ -56,7 +54,7 @@ class ChoicesOffline extends Component
 		public mixed $prepend = null,
 		public mixed $append = null
 	) {
-		$this->uuid = "choices-offline-" . ++self::$counter;
+		$this->uuid = "choices-offline-" . serialize($this) . $id;
 
 		if (($this->allowAll || $this->compact) && ($this->single || $this->searchable)) {
 			throw new Exception("`allow-all` and `compact` does not work combined with `single` or `searchable`.");
